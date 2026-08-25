@@ -6,7 +6,9 @@ import type {
   SessionResponse,
 } from "../types";
 
-const API_BASE = `${import.meta.env.BASE_URL}api`;
+export const API_BASE = (
+  import.meta.env.VITE_API_BASE_URL || `${import.meta.env.BASE_URL}api`
+).replace(/\/$/, "");
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {

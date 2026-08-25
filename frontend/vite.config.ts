@@ -3,7 +3,7 @@ import vue from "@vitejs/plugin-vue";
 
 export default defineConfig(({ command }) => ({
   plugins: [vue()],
-  base: command === "build" ? "/TINAapimed/" : "/",
+  base: command === "build" ? process.env.VITE_BASE_PATH || "/TINAapimed/" : "/",
   server: {
     port: 5173,
     proxy: {

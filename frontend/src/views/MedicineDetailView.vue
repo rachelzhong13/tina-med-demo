@@ -2,7 +2,7 @@
 import QRCode from "qrcode";
 import { onMounted, onUnmounted, ref } from "vue";
 import { RouterLink, useRoute } from "vue-router";
-import { createSession, getHistory, getMedicine } from "../api/client";
+import { API_BASE, createSession, getHistory, getMedicine } from "../api/client";
 import type { Medicine } from "../types";
 
 const route = useRoute();
@@ -47,7 +47,7 @@ async function loadAssistantSession(medicineId: string) {
 function loadWaterDropAssistant(currentMedicine: Medicine, sessionId: string) {
   const baseUrl = import.meta.env.BASE_URL;
   window.WATER_DROP_ASSISTANT_CONFIG = {
-    apiBase: `${baseUrl}api`,
+    apiBase: API_BASE,
     apiPath: "/chat",
     iconUrl: `${baseUrl}widget/water-drop-icon.png`,
     title: "药品 AI 助手",
