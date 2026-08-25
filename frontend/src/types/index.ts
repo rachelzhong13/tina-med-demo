@@ -34,13 +34,6 @@ export interface ChatHistory {
   messages: ChatMessage[];
 }
 
-export interface ChatResponse {
-  session_id: string;
-  medicine_id: string;
-  answer: string;
-  created_at: string;
-}
-
 export interface SessionResponse {
   session_id: string;
   medicine_id: string;

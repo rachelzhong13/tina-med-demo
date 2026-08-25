@@ -1,12 +1,13 @@
 import { createRouter, createWebHistory } from "vue-router";
 
+const DEFAULT_MEDICINE_ID = "medicine-001";
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: "/",
-      name: "home",
-      component: () => import("../views/HomeView.vue"),
+      redirect: { name: "medicine", params: { id: DEFAULT_MEDICINE_ID } },
     },
     {
       path: "/medicine/:id",
@@ -15,8 +16,11 @@ const router = createRouter({
     },
     {
       path: "/medicine/:id/chat",
-      name: "chat",
-      component: () => import("../views/ChatView.vue"),
+      redirect: (to) => ({ name: "medicine", params: { id: to.params.id } }),
+    },
+    {
+      path: "/:pathMatch(.*)*",
+      redirect: { name: "medicine", params: { id: DEFAULT_MEDICINE_ID } },
     },
   ],
 });

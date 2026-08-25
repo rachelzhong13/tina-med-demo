@@ -74,8 +74,8 @@
 
       #fab {
         position: fixed;
-        right: 24px;
-        bottom: 24px;
+        right: max(24px, env(safe-area-inset-right));
+        bottom: max(24px, env(safe-area-inset-bottom));
         width: 72px;
         height: 72px;
         border: none;
@@ -103,6 +103,13 @@
         transform: translateY(0) scale(.98);
       }
 
+      #fab:focus-visible,
+      #close:focus-visible,
+      #send:focus-visible {
+        outline: 3px solid rgba(111, 147, 95, .4);
+        outline-offset: 2px;
+      }
+
       #fab img {
         width: 100%;
         height: 100%;
@@ -117,7 +124,7 @@
         right: 24px;
         bottom: 112px;
         width: min(360px, calc(100vw - 32px));
-        height: min(520px, calc(100vh - 144px));
+        height: min(520px, calc(100dvh - 144px));
         background: #fbfcf4;
         border: 1px solid rgba(184, 199, 154, .7);
         border-radius: 18px;
@@ -141,6 +148,7 @@
         color: #26351f;
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: 10px;
         font-size: 15px;
         font-weight: 700;
@@ -153,6 +161,38 @@
         object-fit: cover;
         border: 1px solid rgba(255, 255, 255, .8);
         box-shadow: 0 4px 12px rgba(86, 103, 62, .18);
+      }
+
+      #hdr-identity {
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      #hdr-identity span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      #close {
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+        display: grid;
+        place-items: center;
+        padding: 0;
+        color: #405238;
+        background: rgba(255, 255, 255, .42);
+        border: 1px solid rgba(132, 156, 108, .34);
+        border-radius: 12px;
+        cursor: pointer;
+        font: 24px/1 Arial, sans-serif;
+      }
+
+      #close:hover {
+        background: rgba(255, 255, 255, .72);
       }
 
       #msgs {
@@ -241,28 +281,36 @@
 
       @media (max-width: 520px) {
         #fab {
-          right: 16px;
-          bottom: 16px;
+          right: max(16px, env(safe-area-inset-right));
+          bottom: max(16px, env(safe-area-inset-bottom));
           width: 64px;
           height: 64px;
         }
 
         #panel {
-          right: 16px;
-          bottom: 96px;
-          height: min(510px, calc(100vh - 120px));
+          right: max(12px, env(safe-area-inset-right));
+          bottom: max(92px, calc(env(safe-area-inset-bottom) + 80px));
+          height: min(510px, calc(100dvh - 120px));
+          border-radius: 20px;
+        }
+
+        #inp {
+          font-size: 16px;
         }
       }
     </style>
 
-    <button id="fab" title="${title}" aria-label="打开${title}">
+    <button id="fab" title="${title}" aria-label="打开${title}" aria-controls="panel" aria-expanded="false">
       <img src="${iconUrl}" alt="" />
     </button>
 
-    <div id="panel" role="dialog" aria-label="${title}">
+    <div id="panel" role="dialog" aria-label="${title}" aria-hidden="true">
       <div id="hdr">
-        <img src="${iconUrl}" alt="" />
-        <span>${title}</span>
+        <span id="hdr-identity">
+          <img src="${iconUrl}" alt="" />
+          <span>${title}</span>
+        </span>
+        <button id="close" type="button" aria-label="关闭${title}">×</button>
       </div>
       <div id="msgs" aria-live="polite"></div>
       <div id="bar">
@@ -277,13 +325,21 @@
   var msgs = shadow.getElementById("msgs");
   var inp = shadow.getElementById("inp");
   var send = shadow.getElementById("send");
+  var close = shadow.getElementById("close");
   var dragState = null;
   var movedDuringPointer = false;
 
   function setPanelOpen(open) {
     panel.classList.toggle("open", open);
     fab.setAttribute("aria-label", (open ? "关闭" : "打开") + title);
-    if (open) inp.focus();
+    fab.setAttribute("aria-expanded", String(open));
+    panel.setAttribute("aria-hidden", String(!open));
+    if (open) {
+      positionPanelNearFab();
+      requestAnimationFrame(function () {
+        inp.focus();
+      });
+    }
   }
 
   function positionPanelNearFab() {
@@ -392,7 +448,11 @@
       return;
     }
     setPanelOpen(!panel.classList.contains("open"));
-    if (panel.classList.contains("open")) positionPanelNearFab();
+  });
+
+  close.addEventListener("click", function () {
+    setPanelOpen(false);
+    fab.focus();
   });
 
   document.addEventListener("pointerdown", function (e) {
@@ -403,6 +463,19 @@
 
   window.addEventListener("resize", function () {
     if (panel.classList.contains("open")) positionPanelNearFab();
+  });
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", function () {
+      if (panel.classList.contains("open")) positionPanelNearFab();
+    });
+  }
+
+  shadow.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && panel.classList.contains("open")) {
+      setPanelOpen(false);
+      fab.focus();
+    }
   });
 
   function addBubble(text, who) {

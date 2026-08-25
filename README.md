@@ -3,7 +3,7 @@
 用于 2026 年 9 月 29 日展会展示的最小闭环：
 
 ```text
-药品入口 / 二维码 → 药品详情 → Chat → 当前药品上下文 → OpenAI-compatible LLM
+物品二维码 → 对应药品详情 → 小水滴问答 → 当前药品上下文 → OpenAI-compatible LLM
 ```
 
 当前仓库中的 3 条药品记录全部是明显标记的虚构 Demo 数据，不是正式药品信息，不能据此用药。
@@ -11,7 +11,7 @@
 ## 项目结构
 
 - `backend/`：FastAPI、SQLite、药品 API、Chat Session、LLM Service。
-- `frontend/`：Vue 3 + Vite + TypeScript，首页、详情页、Chat 页面。
+- `frontend/`：Vue 3 + Vite + TypeScript，扫码直达的药品详情页和小水滴内嵌问答组件。
 - `deploy/nginx.conf`：供现有 HTTPS Nginx include 的 `/TINAapimed` 配置片段。
 - `docker-compose.yml`：backend 绑定 `127.0.0.1:8000`，frontend 绑定 `127.0.0.1:8080`。
 - `scripts/`：Windows PowerShell 和 Linux 部署/测试脚本。
