@@ -74,8 +74,6 @@ function unloadWaterDropAssistant() {
 onMounted(async () => {
   try {
     medicine.value = await getMedicine(String(route.params.id));
-    const sessionId = await loadAssistantSession(medicine.value.id);
-    loadWaterDropAssistant(medicine.value, sessionId);
     if (medicine.value?.qr_target_url) {
       qrDataUrl.value = await QRCode.toDataURL(medicine.value.qr_target_url, {
         width: 220,
@@ -87,6 +85,15 @@ onMounted(async () => {
     error.value = err instanceof Error ? err.message : "药品资料加载失败";
   } finally {
     loading.value = false;
+  }
+
+  if (!medicine.value) return;
+
+  try {
+    const sessionId = await loadAssistantSession(medicine.value.id);
+    loadWaterDropAssistant(medicine.value, sessionId);
+  } catch (err) {
+    console.error("Water drop assistant failed to initialize", err);
   }
 });
 
