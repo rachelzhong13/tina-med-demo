@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import QRCode from "qrcode";
-import { onMounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import { RouterLink, useRoute } from "vue-router";
-import { getMedicine } from "../api/client";
+import { createSession, getHistory, getMedicine } from "../api/client";
 import type { Medicine } from "../types";
 
 const route = useRoute();
@@ -13,9 +13,69 @@ const error = ref("");
 
 const display = (value: string) => value || "暂无数据";
 
+declare global {
+  interface Window {
+    WATER_DROP_ASSISTANT_CONFIG?: {
+      apiBase: string;
+      apiPath: string;
+      iconUrl: string;
+      title: string;
+      medicineId: string;
+      sessionId: string;
+      context: Medicine;
+    };
+  }
+}
+
+async function loadAssistantSession(medicineId: string) {
+  const sessionKey = `tina-session-${medicineId}`;
+  const saved = localStorage.getItem(sessionKey);
+  if (saved) {
+    try {
+      await getHistory(saved);
+      return saved;
+    } catch {
+      localStorage.removeItem(sessionKey);
+    }
+  }
+
+  const session = await createSession(medicineId);
+  localStorage.setItem(sessionKey, session.session_id);
+  return session.session_id;
+}
+
+function loadWaterDropAssistant(currentMedicine: Medicine, sessionId: string) {
+  const baseUrl = import.meta.env.BASE_URL;
+  window.WATER_DROP_ASSISTANT_CONFIG = {
+    apiBase: `${baseUrl}api`,
+    apiPath: "/chat",
+    iconUrl: `${baseUrl}widget/water-drop-icon.png`,
+    title: "药品 AI 助手",
+    medicineId: currentMedicine.id,
+    sessionId,
+    context: currentMedicine,
+  };
+
+  if (document.getElementById("water-drop-script")) return;
+
+  const script = document.createElement("script");
+  script.id = "water-drop-script";
+  script.src = `${baseUrl}widget/water-drop.js`;
+  script.async = true;
+  document.body.appendChild(script);
+}
+
+function unloadWaterDropAssistant() {
+  document.getElementById("water-drop-root")?.remove();
+  document.getElementById("water-drop-script")?.remove();
+  delete window.WATER_DROP_ASSISTANT_CONFIG;
+}
+
 onMounted(async () => {
   try {
     medicine.value = await getMedicine(String(route.params.id));
+    const sessionId = await loadAssistantSession(medicine.value.id);
+    loadWaterDropAssistant(medicine.value, sessionId);
     if (medicine.value?.qr_target_url) {
       qrDataUrl.value = await QRCode.toDataURL(medicine.value.qr_target_url, {
         width: 220,
@@ -28,6 +88,10 @@ onMounted(async () => {
   } finally {
     loading.value = false;
   }
+});
+
+onUnmounted(() => {
+  unloadWaterDropAssistant();
 });
 </script>
 
