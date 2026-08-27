@@ -1,0 +1,16 @@
+[Unit]
+Description=TINA Chat API
+After=network.target tina-product-api.service
+Requires=tina-product-api.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/tina-med-demo/backend
+EnvironmentFile=/opt/tina-med-demo/.env
+Environment=PRODUCT_API_BASE_URL=http://127.0.0.1:8001
+ExecStart=/opt/tina-med-demo/.venv/bin/uvicorn app.chat_api:app --host 127.0.0.1 --port 8002
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

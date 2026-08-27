@@ -65,11 +65,11 @@ def connect() -> sqlite3.Connection:
     return connection
 
 
-def init_db() -> None:
+def init_db(*, seed_products: bool = True) -> None:
     with connect() as connection:
         connection.executescript(SCHEMA)
         count = connection.execute("SELECT COUNT(*) FROM medicines").fetchone()[0]
-        if count == 0:
+        if seed_products and count == 0:
             _insert_medicines(connection, DEMO_MEDICINES)
 
 

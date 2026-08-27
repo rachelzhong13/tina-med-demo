@@ -10,8 +10,9 @@ docker compose config >/dev/null
 docker compose up -d --build
 
 for _ in $(seq 1 30); do
-  if curl --fail --silent http://127.0.0.1:8000/api/health >/dev/null; then
-    echo "TINA Demo services are running. Existing Nginx must include deploy/nginx.conf."
+  if curl --fail --silent http://127.0.0.1:8001/api/health >/dev/null \
+    && curl --fail --silent http://127.0.0.1:8002/api/health >/dev/null; then
+    echo "TINA product and Chat APIs are running. Existing Nginx must include deploy/nginx.conf."
     exit 0
   fi
   sleep 2

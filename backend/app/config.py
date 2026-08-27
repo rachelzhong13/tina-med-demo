@@ -17,6 +17,8 @@ class Settings:
     llm_base_url: str
     llm_model: str
     llm_timeout: float
+    product_api_base_url: str
+    product_api_timeout: float
     public_base_url: str
     cors_origins: tuple[str, ...]
 
@@ -30,6 +32,8 @@ def get_settings() -> Settings:
         llm_base_url=os.getenv("LLM_BASE_URL", "").strip(),
         llm_model=os.getenv("LLM_MODEL", "").strip(),
         llm_timeout=float(os.getenv("LLM_TIMEOUT", "60")),
+        product_api_base_url=os.getenv("PRODUCT_API_BASE_URL", "").strip(),
+        product_api_timeout=float(os.getenv("PRODUCT_API_TIMEOUT", "10")),
         public_base_url=os.getenv(
             "PUBLIC_BASE_URL", "https://iotns.org.cn/TINAapimed"
         ).rstrip("/"),

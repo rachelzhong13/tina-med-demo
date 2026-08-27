@@ -1,19 +1,43 @@
+x-backend-environment: &backend-environment
+  APP_ENV: ${APP_ENV:-production}
+  DATABASE_PATH: /app/data/tina_med.db
+  LLM_API_KEY: ${LLM_API_KEY:-}
+  LLM_BASE_URL: ${LLM_BASE_URL:-http://api.twstars.com:3000/v1}
+  LLM_MODEL: ${LLM_MODEL:-ornith:35b}
+  LLM_TIMEOUT: ${LLM_TIMEOUT:-180}
+  PRODUCT_API_TIMEOUT: ${PRODUCT_API_TIMEOUT:-10}
+  PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-https://iotns.org.cn/TINAapimed}
+  CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,https://rachelzhong13.github.io}
+
 services:
-  backend:
+  product-api:
     build: ./backend
     environment:
-      APP_ENV: ${APP_ENV:-development}
-      DATABASE_PATH: /app/data/tina_med.db
-      LLM_API_KEY: ${LLM_API_KEY:-}
-      LLM_BASE_URL: ${LLM_BASE_URL:-}
-      LLM_MODEL: ${LLM_MODEL:-}
-      LLM_TIMEOUT: ${LLM_TIMEOUT:-60}
-      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-https://iotns.org.cn/TINAapimed}
-      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      <<: *backend-environment
+    command: ["uvicorn", "app.product_api:app", "--host", "0.0.0.0", "--port", "8000"]
     volumes:
       - ./backend/data:/app/data
     ports:
-      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:8001:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  chat-api:
+    build: ./backend
+    environment:
+      <<: *backend-environment
+      PRODUCT_API_BASE_URL: http://product-api:8000
+    command: ["uvicorn", "app.chat_api:app", "--host", "0.0.0.0", "--port", "8000"]
+    volumes:
+      - ./backend/data:/app/data
+    ports:
+      - "127.0.0.1:8002:8000"
+    depends_on:
+      product-api:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
       interval: 10s
@@ -21,9 +45,15 @@ services:
       retries: 5
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        VITE_BASE_PATH: ${VITE_BASE_PATH:-/TINAapimed/}
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-/TINAapimed/api}
     ports:
       - "127.0.0.1:8080:80"
     depends_on:
-      backend:
+      product-api:
+        condition: service_healthy
+      chat-api:
         condition: service_healthy

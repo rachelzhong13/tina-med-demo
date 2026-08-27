@@ -11,8 +11,9 @@ docker compose up -d --build
 $healthy = $false
 for ($i = 0; $i -lt 30; $i++) {
     try {
-        $response = Invoke-RestMethod "http://127.0.0.1:8000/api/health"
-        if ($response.status -eq "ok") { $healthy = $true; break }
+        $productResponse = Invoke-RestMethod "http://127.0.0.1:8001/api/health"
+        $chatResponse = Invoke-RestMethod "http://127.0.0.1:8002/api/health"
+        if ($productResponse.status -eq "ok" -and $chatResponse.status -eq "ok") { $healthy = $true; break }
     } catch { Start-Sleep -Seconds 2 }
 }
 
@@ -21,4 +22,4 @@ if (-not $healthy) {
     throw "Backend health check failed."
 }
 
-Write-Host "TINA Demo services are running. Existing Nginx must include deploy/nginx.conf."
+Write-Host "TINA product and Chat APIs are running. Existing Nginx must include deploy/nginx.conf."

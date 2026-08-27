@@ -14,6 +14,12 @@ def test_get_medicines(client):
     assert all("DEMO" in item["source"] for item in response.json())
 
 
+def test_product_api_uses_independent_route_group(client):
+    response = client.get("/api/products")
+    assert response.status_code == 200
+    assert response.json()[0]["id"].startswith("medicine-")
+
+
 def test_get_medicine_by_slug(client):
     response = client.get("/api/medicines/demo-clear-a")
     assert response.status_code == 200
@@ -62,3 +68,26 @@ def test_session_medicine_mismatch_is_rejected(client):
         },
     )
     assert response.status_code == 409
+
+
+def test_independent_product_api_app(client):
+    from fastapi.testclient import TestClient
+
+    from app.product_api import app
+
+    with TestClient(app) as product_client:
+        response = product_client.get("/api/products/medicine-001")
+    assert response.status_code == 200
+    assert response.json()["id"] == "medicine-001"
+
+
+def test_independent_chat_api_app(client):
+    from fastapi.testclient import TestClient
+
+    from app.chat_api import app
+
+    with TestClient(app) as chat_client:
+        response = chat_client.post(
+            "/api/chat/sessions", json={"medicine_id": "medicine-001"}
+        )
+    assert response.status_code == 201
