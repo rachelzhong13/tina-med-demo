@@ -1,6 +1,14 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
+import { computed, onUnmounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import ExhibitSection from "../components/ExhibitSection.vue";
+import ProductVisual from "../components/ProductVisual.vue";
+import {
+  exhibitConfig,
+  fieldLabels,
+  getVisibleSections,
+  resolveVariantId,
+} from "../config/exhibit";
 import { API_BASE, createSession, getHistory, getMedicine } from "../api/client";
 import type { Medicine } from "../types";
 
@@ -8,8 +16,30 @@ const route = useRoute();
 const medicine = ref<Medicine | null>(null);
 const loading = ref(true);
 const error = ref("");
+let medicineRequest = 0;
+let assistantRequest = 0;
 
-const display = (value: string) => value || "暂无数据";
+const activeVariantId = computed(() =>
+  resolveVariantId(medicine.value?.id, route.query.variant),
+);
+
+const variant = computed(() => exhibitConfig.variants[activeVariantId.value]);
+
+const sections = computed(() => getVisibleSections(variant.value));
+
+const heroLead = computed(() => {
+  if (!medicine.value) return "";
+  return String(medicine.value[variant.value.hero.leadField] || "暂无资料");
+});
+
+const heroFacts = computed(() => {
+  if (!medicine.value) return [];
+  return variant.value.hero.factFields.map((field) => ({
+    field,
+    label: fieldLabels[field],
+    value: String(medicine.value?.[field] || "暂无资料"),
+  }));
+});
 
 declare global {
   interface Window {
@@ -19,8 +49,12 @@ declare global {
       iconUrl: string;
       title: string;
       medicineId: string;
+      medicineName: string;
       sessionId: string;
       context: Medicine;
+      variant: string;
+      mode: string;
+      greeting: string;
     };
   }
 }
@@ -48,13 +82,15 @@ function loadWaterDropAssistant(currentMedicine: Medicine, sessionId: string) {
     apiBase: API_BASE,
     apiPath: "/chat",
     iconUrl: `${baseUrl}widget/water-drop-icon.png`,
-    title: "药品 AI 助手",
+    title: "TINA 样品助手",
     medicineId: currentMedicine.id,
+    medicineName: currentMedicine.name.replace(/\s*DEMO\s*$/i, ""),
     sessionId,
     context: currentMedicine,
+    variant: activeVariantId.value,
+    mode: variant.value.assistant.mode,
+    greeting: variant.value.assistant.greeting,
   };
-
-  if (document.getElementById("water-drop-script")) return;
 
   const script = document.createElement("script");
   script.id = "water-drop-script";
@@ -69,63 +105,133 @@ function unloadWaterDropAssistant() {
   delete window.WATER_DROP_ASSISTANT_CONFIG;
 }
 
-onMounted(async () => {
-  try {
-    medicine.value = await getMedicine(String(route.params.id));
-  } catch (err) {
-    error.value = err instanceof Error ? err.message : "药品资料加载失败";
-  } finally {
-    loading.value = false;
-  }
+async function mountAssistant() {
+  const currentMedicine = medicine.value;
+  if (!currentMedicine) return;
 
-  if (!medicine.value) return;
-
+  const request = ++assistantRequest;
+  unloadWaterDropAssistant();
   try {
-    const sessionId = await loadAssistantSession(medicine.value.id);
-    loadWaterDropAssistant(medicine.value, sessionId);
+    const sessionId = await loadAssistantSession(currentMedicine.id);
+    if (request !== assistantRequest || medicine.value?.id !== currentMedicine.id) {
+      return;
+    }
+    loadWaterDropAssistant(currentMedicine, sessionId);
   } catch (err) {
     console.error("Water drop assistant failed to initialize", err);
   }
-});
+}
+
+async function loadMedicine(identifier: string) {
+  const request = ++medicineRequest;
+  assistantRequest += 1;
+  unloadWaterDropAssistant();
+  loading.value = true;
+  error.value = "";
+  medicine.value = null;
+
+  try {
+    const result = await getMedicine(identifier);
+    if (request !== medicineRequest) return;
+    medicine.value = result;
+    document.title = `${result.name.replace(/\s*DEMO\s*$/i, "")} · TINA`;
+  } catch (err) {
+    if (request !== medicineRequest) return;
+    error.value = err instanceof Error ? err.message : "样品资料加载失败";
+  } finally {
+    if (request === medicineRequest) loading.value = false;
+  }
+}
+
+watch(
+  () => String(route.params.id || ""),
+  (identifier) => {
+    if (identifier) void loadMedicine(identifier);
+  },
+  { immediate: true },
+);
+
+watch(
+  () => [medicine.value?.id, activeVariantId.value] as const,
+  ([medicineId]) => {
+    if (medicineId) void mountAssistant();
+  },
+  { flush: "post" },
+);
 
 onUnmounted(() => {
+  medicineRequest += 1;
+  assistantRequest += 1;
   unloadWaterDropAssistant();
 });
 </script>
 
 <template>
-  <p v-if="loading" class="state-card">正在加载药品资料…</p>
-  <p v-else-if="error" class="state-card error-card">{{ error }}</p>
-  <section v-else-if="medicine" class="detail-layout">
-    <div class="detail-main">
-      <div class="detail-heading">
-        <div>
-          <p class="eyebrow">{{ medicine.category }}</p>
-          <h1>{{ medicine.name }}</h1>
-          <p class="subtitle">{{ medicine.generic_name }}</p>
+  <div v-if="loading" class="state-view" role="status" aria-live="polite">
+    <span class="state-view__pulse" aria-hidden="true"></span>
+    <p>正在装载样品档案</p>
+  </div>
+
+  <div v-else-if="error" class="state-view state-view--error" role="alert">
+    <strong>样品档案暂时无法读取</strong>
+    <p>{{ error }}</p>
+    <p>请检查网络后刷新当前二维码页面。</p>
+  </div>
+
+  <article
+    v-else-if="medicine"
+    class="medicine-experience"
+    :class="`variant-${activeVariantId}`"
+    :data-medicine="medicine.id"
+    :data-variant="activeVariantId"
+  >
+    <header class="medicine-hero">
+      <div class="medicine-identity">
+        <h1>{{ medicine.name.replace(/\s*DEMO\s*$/i, "") }}</h1>
+        <div class="identity-line">
+          <span class="demo-chip">虚构展品 · 不可服用</span>
+          <span>{{ medicine.category }}</span>
         </div>
-        <span class="demo-badge">DEMO / MOCK</span>
-      </div>
-      <p class="notice">这是用于展会展示的虚构药品资料，不是正式药品说明，不可据此用药。</p>
+        <p class="medicine-generic">{{ medicine.generic_name }}</p>
+        <p class="medicine-lead">{{ heroLead }}</p>
 
-      <div class="info-grid">
-        <div><span>生产企业</span><strong>{{ display(medicine.manufacturer) }}</strong></div>
-        <div><span>批准文号</span><strong>{{ display(medicine.approval_number) }}</strong></div>
-        <div><span>条码</span><strong>{{ display(medicine.barcode) }}</strong></div>
-        <div><span>数据来源</span><strong>{{ display(medicine.source) }}</strong></div>
-      </div>
-
-      <div class="detail-copy">
-        <h2>产品描述</h2>
-        <p>{{ display(medicine.description) }}</p>
-        <h2>资料摘要</h2>
-        <dl>
-          <div><dt>适应症</dt><dd>{{ display(medicine.indications) }}</dd></div>
-          <div><dt>用法</dt><dd>{{ display(medicine.usage) }}</dd></div>
-          <div><dt>禁忌</dt><dd>{{ display(medicine.contraindications) }}</dd></div>
-          <div><dt>警告</dt><dd>{{ display(medicine.warnings) }}</dd></div>
+        <dl class="hero-facts">
+          <div v-for="fact in heroFacts" :key="fact.field">
+            <dt>{{ fact.label }}</dt>
+            <dd>{{ fact.value }}</dd>
+          </div>
         </dl>
+
+        <p v-if="activeVariantId === 'companion'" class="assistant-presence">
+          TINA 的小水滴会在右下角等你；点击角色即可提问。
+        </p>
       </div>
+
+      <ProductVisual
+        :medicine="medicine"
+        :variant-id="activeVariantId"
+        :variant="variant"
+      />
+    </header>
+
+    <aside class="demo-disclaimer" aria-label="演示资料声明">
+      <strong>DEMO DATA</strong>
+      <p>这是用于展会体验的完整虚构样品资料，不是正式药品说明，也不能作为诊疗或用药依据。</p>
+    </aside>
+
+    <div class="exhibit-flow">
+      <ExhibitSection
+        v-for="section in sections"
+        :key="section.id"
+        :section="section"
+        :medicine="medicine"
+        :variant-id="activeVariantId"
+      />
     </div>
-  </section>
+
+    <footer class="sample-footer">
+      <span>TINA EXHIBITION SAMPLE</span>
+      <span>{{ medicine.id }} · {{ variant.name }}</span>
+    </footer>
+  </article>
 </template>

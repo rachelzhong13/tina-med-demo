@@ -9,6 +9,7 @@ services:
       LLM_MODEL: ${LLM_MODEL:-}
       LLM_TIMEOUT: ${LLM_TIMEOUT:-60}
       PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-https://iotns.org.cn/TINAapimed}
+      PUBLIC_ROUTER_MODE: ${PUBLIC_ROUTER_MODE:-history}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
     volumes:
       - ./backend/data:/app/data

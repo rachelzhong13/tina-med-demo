@@ -18,6 +18,7 @@ class Settings:
     llm_model: str
     llm_timeout: float
     public_base_url: str
+    public_router_mode: str
     cors_origins: tuple[str, ...]
 
 
@@ -33,5 +34,6 @@ def get_settings() -> Settings:
         public_base_url=os.getenv(
             "PUBLIC_BASE_URL", "https://iotns.org.cn/TINAapimed"
         ).rstrip("/"),
+        public_router_mode=os.getenv("PUBLIC_ROUTER_MODE", "history").strip().lower(),
         cors_origins=tuple(origin.strip() for origin in origins if origin.strip()),
     )

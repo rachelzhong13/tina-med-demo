@@ -11,6 +11,11 @@ export interface MedicineSummary {
 export interface Medicine extends MedicineSummary {
   approval_number: string;
   barcode: string;
+  dosage_form: string;
+  specification: string;
+  package_description: string;
+  appearance: string;
+  storage: string;
   indications: string;
   usage: string;
   contraindications: string;
@@ -18,6 +23,7 @@ export interface Medicine extends MedicineSummary {
   description: string;
   image_url: string;
   qr_target_url: string;
+  demo_only: boolean;
   created_at: string;
   updated_at: string;
 }

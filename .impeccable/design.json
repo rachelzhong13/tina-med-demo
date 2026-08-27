@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-27T15:41:23.7649513Z",
+  "title": "Design System: TINA Medicine Exhibition",
+  "extensions": {
+    "colorMeta": {
+      "clinical-accent": {
+        "role": "primary",
+        "displayName": "临床青蓝",
+        "canonical": "#08788e",
+        "tonalRamp": ["#04252d", "#064250", "#08788e", "#2a94a6", "#62b3bf", "#9dd0d7", "#dcebed", "#f3fafb"]
+      },
+      "companion-accent": {
+        "role": "primary",
+        "displayName": "陪伴植绿",
+        "canonical": "#527d5b",
+        "tonalRamp": ["#17271c", "#294432", "#315d43", "#527d5b", "#7d9f82", "#abc1aa", "#dce8d1", "#f4f7ef"]
+      },
+      "editorial-accent": {
+        "role": "primary",
+        "displayName": "编辑朱红",
+        "canonical": "#d3392e",
+        "tonalRamp": ["#3b0f0c", "#6f1c17", "#a62520", "#d3392e", "#df6a62", "#e99c96", "#f3ceca", "#fbefed"]
+      },
+      "demo-warning": {
+        "role": "tertiary",
+        "displayName": "Demo 信号黄",
+        "canonical": "#f3df9e",
+        "tonalRamp": ["#392f11", "#6b591e", "#9c8330", "#c5a94f", "#dec77a", "#f3df9e", "#f8ebc3", "#fdf8e8"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "展品名称",
+        "purpose": "样品身份和设计评审主标题；允许中文主动换行。"
+      },
+      "body": {
+        "displayName": "展品资料正文",
+        "purpose": "快速扫描与较长说明，移动端基准 16px。"
+      },
+      "label": {
+        "displayName": "标签与字段名",
+        "purpose": "Demo 状态、字段名和追溯元数据。"
+      }
+    },
+    "shadows": [
+      {
+        "name": "pack-float",
+        "value": "18px 24px 48px rgba(23, 45, 39, 0.18)",
+        "purpose": "让合成包装模型离开展品背景。"
+      },
+      {
+        "name": "companion-surface",
+        "value": "14px 22px 54px rgba(43, 67, 50, 0.12)",
+        "purpose": "仅用于 Companion 首屏主容器。"
+      },
+      {
+        "name": "assistant-panel",
+        "value": "0 26px 64px rgba(30, 43, 35, 0.28)",
+        "purpose": "小水滴问答面板的最高悬浮层级。"
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-fast",
+        "value": "180ms cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "按压、悬停和拖动反馈。"
+      },
+      {
+        "name": "panel-enter",
+        "value": "260ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "问答面板从小水滴来源位置进入。"
+      }
+    ],
+    "breakpoints": [
+      { "name": "mobile-content", "value": "720px" },
+      { "name": "single-column", "value": "900px" },
+      { "name": "review-stack", "value": "1120px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Demo Chip",
+      "kind": "chip",
+      "refersTo": "demo-chip",
+      "description": "持续可见的虚构与不可服用标记。",
+      "html": "<span class=\"ds-demo-chip\">虚构展品 · 不可服用</span>",
+      "css": ".ds-demo-chip { min-height: 30px; padding: 6px 10px; display: inline-flex; align-items: center; color: #102e39; background: #f3df9e; border-radius: 999px; font: 800 12px/1.4 Aptos, sans-serif; }"
+    },
+    {
+      "name": "Assistant Send",
+      "kind": "button",
+      "refersTo": "assistant-send",
+      "description": "小水滴面板中唯一的主要表单操作。",
+      "html": "<button class=\"ds-assistant-send\">发送</button>",
+      "css": ".ds-assistant-send { min-width: 68px; min-height: 48px; padding: 0 14px; color: #fff; background: #315d43; border: 0; border-radius: 12px; font-weight: 800; transition: background-color 140ms ease, opacity 140ms ease; cursor: pointer; } .ds-assistant-send:hover { background: #527d5b; } .ds-assistant-send:active { opacity: .82; } .ds-assistant-send:focus-visible { outline: 3px solid #0b78d0; outline-offset: 2px; }"
+    },
+    {
+      "name": "Assistant Input",
+      "kind": "input",
+      "refersTo": "assistant-input",
+      "description": "带可见焦点、足够触控高度和移动端防缩放字号的问题输入框。",
+      "html": "<label class=\"ds-assistant-label\">询问当前样品<input class=\"ds-assistant-input\" placeholder=\"输入问题…\"></label>",
+      "css": ".ds-assistant-label { display: grid; gap: 8px; color: #536258; font: 700 12px/1.4 Aptos, sans-serif; } .ds-assistant-input { min-height: 48px; padding: 0 12px; color: #22372c; background: #fff; border: 1px solid #bdc8b9; border-radius: 12px; font-size: 16px; } .ds-assistant-input:focus-visible { outline: 3px solid #0b78d0; outline-offset: 2px; border-color: #527d5b; }"
+    },
+    {
+      "name": "Companion Care Surface",
+      "kind": "card",
+      "refersTo": "companion-care",
+      "description": "陪伴方案中承载一条核心解释的深绿护理面。",
+      "html": "<section class=\"ds-care-surface\"><h3>这件样品想表达什么</h3><p>先给访客一条可理解的现场解释。</p></section>",
+      "css": ".ds-care-surface { padding: 42px; color: #f8faf4; background: #315d43; border-radius: 16px; font-family: Aptos, sans-serif; } .ds-care-surface h3 { margin: 0 0 16px; font-size: 28px; line-height: 1.15; } .ds-care-surface p { margin: 0; font-size: 18px; line-height: 1.7; }"
+    },
+    {
+      "name": "Demo Strip",
+      "kind": "custom",
+      "refersTo": "demo-strip",
+      "description": "横跨首屏下沿的完整 Demo 安全声明。",
+      "html": "<aside class=\"ds-demo-strip\"><strong>DEMO DATA</strong><span>虚构样品资料，不可作为诊疗或用药依据。</span></aside>",
+      "css": ".ds-demo-strip { padding: 18px 22px; display: flex; align-items: center; gap: 22px; color: #4f3d0b; background: #f3df9e; border-block: 1px solid #b5912a; font: 400 14px/1.65 Aptos, sans-serif; } .ds-demo-strip strong { font-size: 12px; letter-spacing: .12em; }"
+    },
+    {
+      "name": "Traceability Disclosure",
+      "kind": "custom",
+      "description": "使用原生 details 保留键盘和屏幕阅读器行为的次级档案。",
+      "html": "<details class=\"ds-trace\"><summary>追溯信息 <span>展开档案</span></summary><p>设计生产方 · 演示识别号 · 资料来源</p></details>",
+      "css": ".ds-trace { color: #102e39; border-block: 1px solid #a9bec3; font-family: Aptos, sans-serif; } .ds-trace summary { min-height: 64px; padding: 14px 0; display: flex; align-items: center; justify-content: space-between; gap: 18px; cursor: pointer; font-size: 24px; font-weight: 790; } .ds-trace summary:focus-visible { outline: 3px solid #0b78d0; outline-offset: 3px; } .ds-trace summary span { color: #506d76; font-size: 12px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "会说话的展品标签",
+    "overview": "TINA 的页面首先是一张与实物样品绑定的博物馆式标签，其次才是一个带问答能力的界面。系统用临床记录的精确、护理卡片的陪伴和药盒编辑设计的张力表达同一组事实。",
+    "keyCharacteristics": [
+      "扫码后立即呈现一个样品，不出现选择首页或二次扫码模块。",
+      "大标题、包装模型和关键事实共同构成首屏，问答入口固定为右下角小水滴。",
+      "三套方案共用数据和组件逻辑，通过配置改变信息架构与视觉语法。",
+      "Demo 身份是持续可见的安全边界，不是页脚里的附注。"
+    ],
+    "rules": [
+      { "name": "The Demo Signal Rule", "body": "黄色始终意味着‘这是虚构展品资料’，不得被复用为普通选中态或促销色。", "section": "colors" },
+      { "name": "The Identity First Rule", "body": "样品名永远是首个 H1；AI、Agent 或装饰性眉题不得抢在它之前。", "section": "typography" },
+      { "name": "The QR Arrival Rule", "body": "路径从 /medicine/:id 开始，首屏直接回答‘这是什么’。", "section": "layout" },
+      { "name": "The Flat Information Rule", "body": "普通资料靠留白、规则线和色面分组，不把每段文字塞进同尺寸卡片。", "section": "elevation" }
+    ],
+    "dos": [
+      "让样品身份、关键事实与 Demo 边界在几秒内可见。",
+      "用 exhibit-ui.json 管理方案、顺序、可见性和呈现角色，并保持药品事实独立。",
+      "在 320px、现代手机、横屏和桌面共同验证触控、换行、安全区与 200% 文本缩放。",
+      "让网络或 LLM 失败只影响问答，不影响样品资料阅读。",
+      "保留小水滴作为唯一入口，并让它的每个交互状态有明确反馈。"
+    ],
+    "donts": [
+      "添加药品选择首页、页面内扫码器、独立聊天页或第二个 Agent 按钮。",
+      "把三套方案复制成三份详情页，或只通过换色制造不同方案。",
+      "用真实医疗口吻包装 Demo 内容，或编造药效、批准文号、品牌和照片。",
+      "用通用 AI 渐变、玻璃卡片、emoji 图标或无意义弹跳削弱展品标签的可信感。",
+      "修改、拉伸或重新生成项目方提供的小水滴源图。"
+    ]
+  }
+}

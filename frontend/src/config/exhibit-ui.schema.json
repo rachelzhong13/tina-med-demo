@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tina.demo/schemas/exhibit-ui.schema.json",
+  "title": "TINA exhibition UI configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "defaultVariant", "medicines", "variants"],
+  "properties": {
+    "$schema": { "type": "string", "minLength": 1 },
+    "version": { "const": 1 },
+    "defaultVariant": { "$ref": "#/$defs/variantId" },
+    "medicines": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["defaultVariant", "availableVariants"],
+        "properties": {
+          "defaultVariant": { "$ref": "#/$defs/variantId" },
+          "availableVariants": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "$ref": "#/$defs/variantId" }
+          }
+        }
+      }
+    },
+    "variants": {
+      "type": "object",
+      "required": ["clinical", "companion", "editorial"],
+      "additionalProperties": false,
+      "properties": {
+        "clinical": { "$ref": "#/$defs/variant" },
+        "companion": { "$ref": "#/$defs/variant" },
+        "editorial": { "$ref": "#/$defs/variant" }
+      }
+    }
+  },
+  "$defs": {
+    "variantId": {
+      "enum": ["clinical", "companion", "editorial"]
+    },
+    "medicineField": {
+      "enum": [
+        "generic_name",
+        "manufacturer",
+        "approval_number",
+        "barcode",
+        "category",
+        "dosage_form",
+        "specification",
+        "package_description",
+        "appearance",
+        "storage",
+        "indications",
+        "usage",
+        "contraindications",
+        "warnings",
+        "description",
+        "source"
+      ]
+    },
+    "assistant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "greeting"],
+      "properties": {
+        "mode": { "enum": ["supporting", "character", "editorial-mark"] },
+        "greeting": { "type": "string", "minLength": 1 }
+      }
+    },
+    "hero": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["leadField", "factFields", "visual"],
+      "properties": {
+        "leadField": { "$ref": "#/$defs/medicineField" },
+        "factFields": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/medicineField" }
+        },
+        "visual": { "enum": ["precision-pack", "care-object", "label-study"] }
+      }
+    },
+    "section": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "label",
+        "visible",
+        "priority",
+        "order",
+        "presentation",
+        "interactionRole",
+        "fields"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+        "label": { "type": "string", "minLength": 1 },
+        "visible": { "type": "boolean" },
+        "priority": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "order": { "type": "integer", "minimum": 0 },
+        "presentation": {
+          "enum": ["fact-grid", "feature", "care", "steps", "warning", "story", "metadata"]
+        },
+        "interactionRole": { "enum": ["read", "progressive", "assistant-context"] },
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/medicineField" }
+        }
+      }
+    },
+    "variant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "label", "description", "assistant", "hero", "sections"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "assistant": { "$ref": "#/$defs/assistant" },
+        "hero": { "$ref": "#/$defs/hero" },
+        "sections": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/section" }
+        }
+      }
+    }
+  }
+}

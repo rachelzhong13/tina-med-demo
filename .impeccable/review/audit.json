@@ -1,0 +1,772 @@
+[
+  {
+    "id": "clinical-320",
+    "href": "http://127.0.0.1:5173/medicine/medicine-001?variant=clinical",
+    "title": "演示清润片 · TINA",
+    "viewport": {
+      "width": 320,
+      "height": 800
+    },
+    "documentWidth": 320,
+    "horizontalOverflow": 0,
+    "overflow": [],
+    "scannerCopyCount": 0,
+    "externalAgentEntries": 0,
+    "widgetCount": 1,
+    "fab": {
+      "width": 68,
+      "height": 68,
+      "state": "idle",
+      "label": "打开TINA 样品助手"
+    },
+    "panel": null,
+    "shadowTargets": [
+      {
+        "id": "fab",
+        "width": 68,
+        "height": 68
+      },
+      {
+        "id": "close",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "input",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "send",
+        "width": 0,
+        "height": 0
+      }
+    ],
+    "lastBotMessage": "需要核对哪一项样品资料？",
+    "headings": [
+      "演示清润片",
+      "样品规格",
+      "适用场景",
+      "模拟使用方式",
+      "重要提醒",
+      "样品说明"
+    ]
+  },
+  {
+    "id": "clinical-phone",
+    "href": "http://127.0.0.1:5173/medicine/medicine-001?variant=clinical",
+    "title": "演示清润片 · TINA",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "documentWidth": 390,
+    "horizontalOverflow": 0,
+    "overflow": [],
+    "scannerCopyCount": 0,
+    "externalAgentEntries": 0,
+    "widgetCount": 1,
+    "fab": {
+      "width": 68,
+      "height": 68,
+      "state": "idle",
+      "label": "打开TINA 样品助手"
+    },
+    "panel": null,
+    "shadowTargets": [
+      {
+        "id": "fab",
+        "width": 68,
+        "height": 68
+      },
+      {
+        "id": "close",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "input",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "send",
+        "width": 0,
+        "height": 0
+      }
+    ],
+    "lastBotMessage": "需要核对哪一项样品资料？",
+    "headings": [
+      "演示清润片",
+      "样品规格",
+      "适用场景",
+      "模拟使用方式",
+      "重要提醒",
+      "样品说明"
+    ]
+  },
+  {
+    "id": "clinical-desktop",
+    "href": "http://127.0.0.1:5173/medicine/medicine-001?variant=clinical",
+    "title": "演示清润片 · TINA",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "documentWidth": 1430,
+    "horizontalOverflow": 0,
+    "overflow": [],
+    "scannerCopyCount": 0,
+    "externalAgentEntries": 0,
+    "widgetCount": 1,
+    "fab": {
+      "width": 76,
+      "height": 76,
+      "state": "idle",
+      "label": "打开TINA 样品助手"
+    },
+    "panel": null,
+    "shadowTargets": [
+      {
+        "id": "fab",
+        "width": 76,
+        "height": 76
+      },
+      {
+        "id": "close",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "input",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "send",
+        "width": 0,
+        "height": 0
+      }
+    ],
+    "lastBotMessage": "需要核对哪一项样品资料？",
+    "headings": [
+      "演示清润片",
+      "样品规格",
+      "适用场景",
+      "模拟使用方式",
+      "重要提醒",
+      "样品说明"
+    ]
+  },
+  {
+    "id": "companion-320",
+    "href": "http://127.0.0.1:5173/medicine/medicine-001?variant=companion",
+    "title": "演示清润片 · TINA",
+    "viewport": {
+      "width": 320,
+      "height": 800
+    },
+    "documentWidth": 320,
+    "horizontalOverflow": 0,
+    "overflow": [],
+    "scannerCopyCount": 0,
+    "externalAgentEntries": 0,
+    "widgetCount": 1,
+    "fab": {
+      "width": 68,
+      "height": 68,
+      "state": "idle",
+      "label": "打开TINA 样品助手"
+    },
+    "panel": null,
+    "shadowTargets": [
+      {
+        "id": "fab",
+        "width": 68,
+        "height": 68
+      },
+      {
+        "id": "close",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "input",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "send",
+        "width": 0,
+        "height": 0
+      }
+    ],
+    "lastBotMessage": "你好，我可以陪你读懂这份展品资料。",
+    "headings": [
+      "演示清润片",
+      "这件样品想表达什么",
+      "怎么理解模拟用法",
+      "先记住这件事",
+      "样品故事",
+      "包装里的信息"
+    ]
+  },
+  {
+    "id": "companion-phone",
+    "href": "http://127.0.0.1:5173/medicine/medicine-001?variant=companion",
+    "title": "演示清润片 · TINA",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "documentWidth": 390,
+    "horizontalOverflow": 0,
+    "overflow": [],
+    "scannerCopyCount": 0,
+    "externalAgentEntries": 0,
+    "widgetCount": 1,
+    "fab": {
+      "width": 68,
+      "height": 68,
+      "state": "idle",
+      "label": "打开TINA 样品助手"
+    },
+    "panel": null,
+    "shadowTargets": [
+      {
+        "id": "fab",
+        "width": 68,
+        "height": 68
+      },
+      {
+        "id": "close",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "input",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "send",
+        "width": 0,
+        "height": 0
+      }
+    ],
+    "lastBotMessage": "你好，我可以陪你读懂这份展品资料。",
+    "headings": [
+      "演示清润片",
+      "这件样品想表达什么",
+      "怎么理解模拟用法",
+      "先记住这件事",
+      "样品故事",
+      "包装里的信息"
+    ]
+  },
+  {
+    "id": "companion-desktop",
+    "href": "http://127.0.0.1:5173/medicine/medicine-001?variant=companion",
+    "title": "演示清润片 · TINA",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "documentWidth": 1430,
+    "horizontalOverflow": 0,
+    "overflow": [],
+    "scannerCopyCount": 0,
+    "externalAgentEntries": 0,
+    "widgetCount": 1,
+    "fab": {
+      "width": 76,
+      "height": 76,
+      "state": "idle",
+      "label": "打开TINA 样品助手"
+    },
+    "panel": null,
+    "shadowTargets": [
+      {
+        "id": "fab",
+        "width": 76,
+        "height": 76
+      },
+      {
+        "id": "close",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "input",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "send",
+        "width": 0,
+        "height": 0
+      }
+    ],
+    "lastBotMessage": "你好，我可以陪你读懂这份展品资料。",
+    "headings": [
+      "演示清润片",
+      "这件样品想表达什么",
+      "怎么理解模拟用法",
+      "先记住这件事",
+      "样品故事",
+      "包装里的信息"
+    ]
+  },
+  {
+    "id": "editorial-320",
+    "href": "http://127.0.0.1:5173/medicine/medicine-001?variant=editorial",
+    "title": "演示清润片 · TINA",
+    "viewport": {
+      "width": 320,
+      "height": 800
+    },
+    "documentWidth": 320,
+    "horizontalOverflow": 0,
+    "overflow": [],
+    "scannerCopyCount": 0,
+    "externalAgentEntries": 0,
+    "widgetCount": 1,
+    "fab": {
+      "width": 68,
+      "height": 68,
+      "state": "idle",
+      "label": "打开TINA 样品助手"
+    },
+    "panel": null,
+    "shadowTargets": [
+      {
+        "id": "fab",
+        "width": 68,
+        "height": 68
+      },
+      {
+        "id": "close",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "input",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "send",
+        "width": 0,
+        "height": 0
+      }
+    ],
+    "lastBotMessage": "从目录中选一个问题，或直接告诉我你想了解什么。",
+    "headings": [
+      "演示清润片",
+      "产品札记",
+      "推荐场景",
+      "使用注记",
+      "形式与包装",
+      "边界声明"
+    ]
+  },
+  {
+    "id": "editorial-phone",
+    "href": "http://127.0.0.1:5173/medicine/medicine-001?variant=editorial",
+    "title": "演示清润片 · TINA",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "documentWidth": 390,
+    "horizontalOverflow": 0,
+    "overflow": [],
+    "scannerCopyCount": 0,
+    "externalAgentEntries": 0,
+    "widgetCount": 1,
+    "fab": {
+      "width": 68,
+      "height": 68,
+      "state": "idle",
+      "label": "打开TINA 样品助手"
+    },
+    "panel": null,
+    "shadowTargets": [
+      {
+        "id": "fab",
+        "width": 68,
+        "height": 68
+      },
+      {
+        "id": "close",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "input",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "send",
+        "width": 0,
+        "height": 0
+      }
+    ],
+    "lastBotMessage": "从目录中选一个问题，或直接告诉我你想了解什么。",
+    "headings": [
+      "演示清润片",
+      "产品札记",
+      "推荐场景",
+      "使用注记",
+      "形式与包装",
+      "边界声明"
+    ]
+  },
+  {
+    "id": "editorial-desktop",
+    "href": "http://127.0.0.1:5173/medicine/medicine-001?variant=editorial",
+    "title": "演示清润片 · TINA",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "documentWidth": 1430,
+    "horizontalOverflow": 0,
+    "overflow": [],
+    "scannerCopyCount": 0,
+    "externalAgentEntries": 0,
+    "widgetCount": 1,
+    "fab": {
+      "width": 76,
+      "height": 76,
+      "state": "idle",
+      "label": "打开TINA 样品助手"
+    },
+    "panel": null,
+    "shadowTargets": [
+      {
+        "id": "fab",
+        "width": 76,
+        "height": 76
+      },
+      {
+        "id": "close",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "input",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "send",
+        "width": 0,
+        "height": 0
+      }
+    ],
+    "lastBotMessage": "从目录中选一个问题，或直接告诉我你想了解什么。",
+    "headings": [
+      "演示清润片",
+      "产品札记",
+      "推荐场景",
+      "使用注记",
+      "形式与包装",
+      "边界声明"
+    ]
+  },
+  {
+    "id": "companion-phone-panel",
+    "href": "http://127.0.0.1:5173/medicine/medicine-002?variant=companion",
+    "title": "演示舒缓胶囊 · TINA",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "documentWidth": 390,
+    "horizontalOverflow": 0,
+    "overflow": [],
+    "scannerCopyCount": 0,
+    "externalAgentEntries": 0,
+    "widgetCount": 1,
+    "fab": {
+      "width": 68,
+      "height": 68,
+      "state": "idle",
+      "label": "关闭TINA 样品助手"
+    },
+    "panel": {
+      "width": 366,
+      "height": 540,
+      "left": 12,
+      "top": 208,
+      "right": 378,
+      "bottom": 748,
+      "state": "idle"
+    },
+    "shadowTargets": [
+      {
+        "id": "fab",
+        "width": 68,
+        "height": 68
+      },
+      {
+        "id": "close",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "id": "input",
+        "width": 268,
+        "height": 48
+      },
+      {
+        "id": "send",
+        "width": 68,
+        "height": 48
+      }
+    ],
+    "lastBotMessage": "你好，我可以陪你读懂这份展品资料。",
+    "headings": [
+      "演示舒缓胶囊",
+      "这件样品想表达什么",
+      "怎么理解模拟用法",
+      "先记住这件事",
+      "样品故事",
+      "包装里的信息"
+    ],
+    "escapeClosed": true
+  },
+  {
+    "id": "clinical-320-panel-reduced",
+    "href": "http://127.0.0.1:5173/medicine/medicine-001?variant=clinical",
+    "title": "演示清润片 · TINA",
+    "viewport": {
+      "width": 320,
+      "height": 800
+    },
+    "documentWidth": 320,
+    "horizontalOverflow": 0,
+    "overflow": [],
+    "scannerCopyCount": 0,
+    "externalAgentEntries": 0,
+    "widgetCount": 1,
+    "fab": {
+      "width": 68,
+      "height": 68,
+      "state": "idle",
+      "label": "关闭TINA 样品助手"
+    },
+    "panel": {
+      "width": 296,
+      "height": 540,
+      "left": 12,
+      "top": 164,
+      "right": 308,
+      "bottom": 704,
+      "state": "idle"
+    },
+    "shadowTargets": [
+      {
+        "id": "fab",
+        "width": 68,
+        "height": 68
+      },
+      {
+        "id": "close",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "id": "input",
+        "width": 198,
+        "height": 48
+      },
+      {
+        "id": "send",
+        "width": 68,
+        "height": 48
+      }
+    ],
+    "lastBotMessage": "需要核对哪一项样品资料？",
+    "headings": [
+      "演示清润片",
+      "样品规格",
+      "适用场景",
+      "模拟使用方式",
+      "重要提醒",
+      "样品说明"
+    ],
+    "activeAnimations": [],
+    "escapeClosed": true
+  },
+  {
+    "id": "companion-phone-error",
+    "href": "http://127.0.0.1:5173/medicine/medicine-002?variant=companion",
+    "title": "演示舒缓胶囊 · TINA",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "documentWidth": 390,
+    "horizontalOverflow": 0,
+    "overflow": [],
+    "scannerCopyCount": 0,
+    "externalAgentEntries": 0,
+    "widgetCount": 1,
+    "fab": {
+      "width": 68,
+      "height": 68,
+      "state": "error",
+      "label": "关闭TINA 样品助手"
+    },
+    "panel": {
+      "width": 366,
+      "height": 540,
+      "left": 12,
+      "top": 208,
+      "right": 378,
+      "bottom": 748,
+      "state": "error"
+    },
+    "shadowTargets": [
+      {
+        "id": "fab",
+        "width": 68,
+        "height": 68
+      },
+      {
+        "id": "close",
+        "width": 44,
+        "height": 44
+      },
+      {
+        "id": "input",
+        "width": 268,
+        "height": 48
+      },
+      {
+        "id": "send",
+        "width": 68,
+        "height": 48
+      }
+    ],
+    "lastBotMessage": "问答服务尚未配置。样品资料仍可正常阅读，请稍后再试。",
+    "headings": [
+      "演示舒缓胶囊",
+      "这件样品想表达什么",
+      "怎么理解模拟用法",
+      "先记住这件事",
+      "样品故事",
+      "包装里的信息"
+    ],
+    "escapeClosed": true
+  },
+  {
+    "id": "editorial-landscape",
+    "href": "http://127.0.0.1:5173/medicine/medicine-003?variant=editorial",
+    "title": "演示康护颗粒 · TINA",
+    "viewport": {
+      "width": 844,
+      "height": 390
+    },
+    "documentWidth": 844,
+    "horizontalOverflow": 0,
+    "overflow": [],
+    "scannerCopyCount": 0,
+    "externalAgentEntries": 0,
+    "widgetCount": 1,
+    "fab": {
+      "width": 76,
+      "height": 76,
+      "state": "idle",
+      "label": "打开TINA 样品助手"
+    },
+    "panel": null,
+    "shadowTargets": [
+      {
+        "id": "fab",
+        "width": 76,
+        "height": 76
+      },
+      {
+        "id": "close",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "input",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "send",
+        "width": 0,
+        "height": 0
+      }
+    ],
+    "lastBotMessage": "从目录中选一个问题，或直接告诉我你想了解什么。",
+    "headings": [
+      "演示康护颗粒",
+      "产品札记",
+      "推荐场景",
+      "使用注记",
+      "形式与包装",
+      "边界声明"
+    ]
+  },
+  {
+    "id": "companion-phone-text-200",
+    "href": "http://127.0.0.1:5173/medicine/medicine-002?variant=companion",
+    "title": "演示舒缓胶囊 · TINA",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "documentWidth": 390,
+    "horizontalOverflow": 0,
+    "overflow": [],
+    "scannerCopyCount": 0,
+    "externalAgentEntries": 0,
+    "widgetCount": 1,
+    "fab": {
+      "width": 68,
+      "height": 68,
+      "state": "idle",
+      "label": "打开TINA 样品助手"
+    },
+    "panel": null,
+    "shadowTargets": [
+      {
+        "id": "fab",
+        "width": 68,
+        "height": 68
+      },
+      {
+        "id": "close",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "input",
+        "width": 0,
+        "height": 0
+      },
+      {
+        "id": "send",
+        "width": 0,
+        "height": 0
+      }
+    ],
+    "lastBotMessage": "你好，我可以陪你读懂这份展品资料。",
+    "headings": [
+      "演示舒缓胶囊",
+      "这件样品想表达什么",
+      "怎么理解模拟用法",
+      "先记住这件事",
+      "样品故事",
+      "包装里的信息"
+    ]
+  }
+]

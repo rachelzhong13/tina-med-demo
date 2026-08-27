@@ -20,5 +20,7 @@ services:
         value: 60
       - key: PUBLIC_BASE_URL
         value: https://rachelzhong13.github.io/tina-med-demo
+      - key: PUBLIC_ROUTER_MODE
+        value: hash
       - key: CORS_ORIGINS
         value: https://rachelzhong13.github.io

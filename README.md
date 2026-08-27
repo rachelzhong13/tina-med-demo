@@ -40,6 +40,16 @@ npm run dev
 
 开发地址为 `http://localhost:5173/`，Vite 会把 `/api` 代理到 `http://127.0.0.1:8000`。
 
+本项目没有药品选择首页，也没有页面内扫码器。访问根路径会直接重定向到默认样品；展会二维码应直接指向对应详情，例如：
+
+```text
+http://localhost:5173/medicine/medicine-001
+http://localhost:5173/medicine/medicine-002
+http://localhost:5173/medicine/medicine-003
+```
+
+本地开发环境还提供 `/design-review`，用于让团队以同一份样品内容并排比较三套候选 UI。它默认不会进入生产构建；如确需在非开发环境启用，设置 `VITE_ENABLE_DESIGN_REVIEW=true`。
+
 也可以运行：
 
 ```powershell
@@ -83,7 +93,17 @@ npm install
 npm run build
 ```
 
-前端生产构建默认使用 `/TINAapimed/` 作为 Vite base path。生产环境的深层链接必须通过 Nginx 转发到 frontend 容器并由其 SPA fallback 处理。
+前端生产构建默认使用 `/TINAapimed/` 作为 Vite base path。Nginx 部署使用 history 路由，深层链接必须转发到 frontend 容器并由其 SPA fallback 处理。
+
+GitHub Pages 工作流使用 hash 路由，因此二维码和手机验证链接应写成：
+
+```text
+https://rachelzhong13.github.io/tina-med-demo/#/medicine/medicine-001
+https://rachelzhong13.github.io/tina-med-demo/#/medicine/medicine-002
+https://rachelzhong13.github.io/tina-med-demo/#/medicine/medicine-003
+```
+
+详情页右下角的“小水滴”是进入 Agent 对话的唯一入口；页面不会再提供第二个聊天按钮或“扫码查看”模块。
 
 ## Docker 和 Nginx 部署
 

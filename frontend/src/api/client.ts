@@ -1,6 +1,7 @@
 import type {
   ChatHistory,
   Medicine,
+  MedicineSummary,
   SessionResponse,
 } from "../types";
 
@@ -24,6 +25,8 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
 export const getMedicine = (id: string) =>
   request<Medicine>(`/medicines/${encodeURIComponent(id)}`);
+
+export const getMedicines = () => request<MedicineSummary[]>("/medicines");
 
 export const createSession = (medicineId: string) =>
   request<SessionResponse>("/chat/sessions", {

@@ -18,6 +18,11 @@ CREATE TABLE IF NOT EXISTS medicines (
     approval_number TEXT NOT NULL,
     barcode TEXT NOT NULL,
     category TEXT NOT NULL,
+    dosage_form TEXT NOT NULL DEFAULT '',
+    specification TEXT NOT NULL DEFAULT '',
+    package_description TEXT NOT NULL DEFAULT '',
+    appearance TEXT NOT NULL DEFAULT '',
+    storage TEXT NOT NULL DEFAULT '',
     indications TEXT NOT NULL,
     usage TEXT NOT NULL,
     contraindications TEXT NOT NULL,
@@ -26,6 +31,7 @@ CREATE TABLE IF NOT EXISTS medicines (
     source TEXT NOT NULL,
     image_url TEXT NOT NULL,
     qr_target_url TEXT NOT NULL,
+    demo_only INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
 );
@@ -49,6 +55,15 @@ CREATE INDEX IF NOT EXISTS idx_chat_messages_session_created
 ON chat_messages(session_id, created_at);
 """
 
+MEDICINE_COLUMN_MIGRATIONS = {
+    "dosage_form": "TEXT NOT NULL DEFAULT ''",
+    "specification": "TEXT NOT NULL DEFAULT ''",
+    "package_description": "TEXT NOT NULL DEFAULT ''",
+    "appearance": "TEXT NOT NULL DEFAULT ''",
+    "storage": "TEXT NOT NULL DEFAULT ''",
+    "demo_only": "INTEGER NOT NULL DEFAULT 1",
+}
+
 
 def _path() -> Path:
     path = Path(get_settings().database_path)
@@ -68,9 +83,20 @@ def connect() -> sqlite3.Connection:
 def init_db() -> None:
     with connect() as connection:
         connection.executescript(SCHEMA)
-        count = connection.execute("SELECT COUNT(*) FROM medicines").fetchone()[0]
-        if count == 0:
-            _insert_medicines(connection, DEMO_MEDICINES)
+        _ensure_medicine_columns(connection)
+        _insert_medicines(connection, DEMO_MEDICINES)
+
+
+def _ensure_medicine_columns(connection: sqlite3.Connection) -> None:
+    existing = {
+        row["name"]
+        for row in connection.execute("PRAGMA table_info(medicines)").fetchall()
+    }
+    for name, definition in MEDICINE_COLUMN_MIGRATIONS.items():
+        if name not in existing:
+            connection.execute(
+                f"ALTER TABLE medicines ADD COLUMN {name} {definition}"
+            )
 
 
 def _insert_medicines(
@@ -87,6 +113,11 @@ def _insert_medicines(
                 approval_number=:approval_number,
                 barcode=:barcode,
                 category=:category,
+                dosage_form=:dosage_form,
+                specification=:specification,
+                package_description=:package_description,
+                appearance=:appearance,
+                storage=:storage,
                 indications=:indications,
                 usage=:usage,
                 contraindications=:contraindications,
@@ -95,6 +126,7 @@ def _insert_medicines(
                 source=:source,
                 image_url=:image_url,
                 qr_target_url=:qr_target_url,
+                demo_only=:demo_only,
                 updated_at=:updated_at
             WHERE id=:id
             """,
@@ -105,14 +137,17 @@ def _insert_medicines(
                 """
                 INSERT INTO medicines (
                     id, slug, name, generic_name, manufacturer, approval_number,
-                    barcode, category, indications, usage, contraindications,
-                    warnings, description, source, image_url, qr_target_url,
-                    created_at, updated_at
+                    barcode, category, dosage_form, specification,
+                    package_description, appearance, storage, indications,
+                    usage, contraindications, warnings, description, source,
+                    image_url, qr_target_url, demo_only, created_at, updated_at
                 ) VALUES (
                     :id, :slug, :name, :generic_name, :manufacturer,
-                    :approval_number, :barcode, :category, :indications, :usage,
-                    :contraindications, :warnings, :description, :source,
-                    :image_url, :qr_target_url, :created_at, :updated_at
+                    :approval_number, :barcode, :category, :dosage_form,
+                    :specification, :package_description, :appearance, :storage,
+                    :indications, :usage, :contraindications, :warnings,
+                    :description, :source, :image_url, :qr_target_url,
+                    :demo_only, :created_at, :updated_at
                 )
                 """,
                 medicine,

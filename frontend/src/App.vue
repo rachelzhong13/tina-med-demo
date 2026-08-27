@@ -1,20 +1,42 @@
 <script setup lang="ts">
-import { RouterView } from "vue-router";
+import { computed } from "vue";
+import { RouterView, useRoute } from "vue-router";
+import { exhibitConfig, resolveVariantId } from "./config/exhibit";
+
+const route = useRoute();
+
+const isDesignReview = computed(() => route.name === "design-review");
+const activeVariantId = computed(() =>
+  resolveVariantId(
+    typeof route.params.id === "string" ? route.params.id : undefined,
+    route.query.variant,
+  ),
+);
+const activeVariant = computed(() => exhibitConfig.variants[activeVariantId.value]);
 </script>
 
 <template>
-  <div class="app-shell">
+  <div
+    class="app-shell"
+    :class="isDesignReview ? 'app-shell--review' : `app-shell--${activeVariantId}`"
+  >
+    <a class="skip-link" href="#main-content">跳至样品资料</a>
     <header class="topbar">
       <div class="brand" aria-label="TINA 药品智能助手">
-        <span class="brand-mark" aria-hidden="true">T</span>
-        <span>TINA 药品智能助手</span>
+        <span class="brand-word">TINA</span>
+        <span class="brand-descriptor">药品智能助手</span>
       </div>
       <span class="topbar-note">
-        <span>展会 Demo</span>
-        <span class="topbar-date">· 2026.09.29</span>
+        <template v-if="isDesignReview">DESIGN REVIEW</template>
+        <template v-else>虚构展品 · {{ activeVariant.label }}</template>
       </span>
     </header>
-    <main class="page-wrap">
+    <main
+      id="main-content"
+      class="page-wrap"
+      :class="{ 'page-wrap--review': isDesignReview }"
+      tabindex="-1"
+    >
       <RouterView />
     </main>
   </div>

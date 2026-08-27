@@ -18,6 +18,11 @@ class MedicineSummary(BaseModel):
 class Medicine(MedicineSummary):
     approval_number: str
     barcode: str
+    dosage_form: str
+    specification: str
+    package_description: str
+    appearance: str
+    storage: str
     indications: str
     usage: str
     contraindications: str
@@ -25,6 +30,7 @@ class Medicine(MedicineSummary):
     description: str
     image_url: str
     qr_target_url: str
+    demo_only: bool
     created_at: str
     updated_at: str
 
