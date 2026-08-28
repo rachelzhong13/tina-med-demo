@@ -25,7 +25,7 @@ const heroFacts = computed(() => medicine.value ? variant.value.hero.factFields.
 declare global {
   interface Window {
     WATER_DROP_ASSISTANT_CONFIG?: {
-      apiBase: string; apiPath: string; iconUrl: string; title: string;
+      apiBase: string; apiPath: string; streamApiPath: string; voiceApiPath: string; iconUrl: string; title: string;
       medicineId: string; medicineName: string; sessionId: string;
       context: Medicine; variant: string; mode: string; greeting: string;
     };
@@ -47,7 +47,7 @@ async function loadAssistantSession(medicineId: string) {
 function loadWaterDropAssistant(currentMedicine: Medicine, sessionId: string) {
   const baseUrl = import.meta.env.BASE_URL;
   window.WATER_DROP_ASSISTANT_CONFIG = {
-    apiBase: API_BASE, apiPath: "/chat", iconUrl: `${baseUrl}widget/water-drop-icon.png`,
+    apiBase: API_BASE, apiPath: "/chat", streamApiPath: "/chat/stream", voiceApiPath: "/chat/voice", iconUrl: `${baseUrl}widget/water-drop-icon.png`,
     title: "TINA 草本样品助手", medicineId: currentMedicine.id,
     medicineName: currentMedicine.name.replace(/\s*DEMO\s*$/i, ""), sessionId,
     context: currentMedicine, variant: activeVariantId.value,

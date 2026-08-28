@@ -19,6 +19,16 @@
   var apiPath =
     (scriptEl && scriptEl.dataset.apiPath) || config.apiPath || "/chat";
   var API = apiBase.replace(/\/$/, "") + apiPath;
+  var streamApiPath =
+    (scriptEl && scriptEl.dataset.streamApiPath) ||
+    config.streamApiPath ||
+    apiPath.replace(/\/chat$/, "/chat/stream");
+  var STREAM_API = apiBase.replace(/\/$/, "") + streamApiPath;
+  var voiceApiPath =
+    (scriptEl && scriptEl.dataset.voiceApiPath) ||
+    config.voiceApiPath ||
+    apiPath.replace(/\/chat$/, "/chat/voice");
+  var VOICE_API = apiBase.replace(/\/$/, "") + voiceApiPath;
   var medicineId =
     (scriptEl && scriptEl.dataset.medicineId) || config.medicineId || "";
   var iconUrl =
@@ -670,6 +680,35 @@
         border-top: 1px solid var(--line);
       }
 
+      #composer.recording #input,
+      #composer.recording #send {
+        display: none;
+      }
+
+      #hold-label {
+        min-width: 0;
+        min-height: 48px;
+        flex: 1;
+        display: none;
+        place-items: center;
+        color: var(--accent-strong);
+        background: #ffffff;
+        border: 1px solid var(--accent);
+        border-radius: 12px;
+        font-size: 15px;
+        font-weight: 760;
+      }
+
+      #composer.recording #hold-label {
+        display: grid;
+      }
+
+      #composer.canceling #hold-label {
+        color: #ffffff;
+        background: var(--danger);
+        border-color: var(--danger);
+      }
+
       #input {
         min-width: 0;
         min-height: 48px;
@@ -733,6 +772,99 @@
         background: #cfd9d1;
         border-color: #cfd9d1;
         cursor: wait;
+      }
+
+      #voice {
+        width: 48px;
+        min-height: 48px;
+        flex: 0 0 auto;
+        display: grid;
+        place-items: center;
+        color: var(--accent-strong);
+        background: #ffffff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 18px;
+        touch-action: none;
+        user-select: none;
+      }
+
+      #voice:active,
+      #voice.recording {
+        color: #ffffff;
+        background: var(--accent-strong);
+        border-color: var(--accent-strong);
+      }
+
+      #voice:disabled {
+        color: #76877b;
+        background: #cfd9d1;
+        border-color: #cfd9d1;
+        cursor: wait;
+      }
+
+      #voice-sheet {
+        position: fixed;
+        left: 50%;
+        bottom: max(112px, calc(env(safe-area-inset-bottom) + 112px));
+        z-index: 2147483647;
+        width: min(270px, calc(100vw - 48px));
+        padding: 18px 16px;
+        display: none;
+        color: #ffffff;
+        text-align: center;
+        background: rgba(35, 55, 43, 0.94);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 18px;
+        box-shadow: 0 22px 52px rgba(35, 55, 43, 0.28);
+        transform: translateX(-50%);
+        pointer-events: none;
+      }
+
+      #voice-sheet.show {
+        display: block;
+      }
+
+      #voice-sheet.canceling {
+        background: rgba(166, 82, 66, 0.95);
+      }
+
+      #voice-wave {
+        height: 34px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: end;
+        justify-content: center;
+        gap: 5px;
+      }
+
+      #voice-wave span {
+        width: 5px;
+        height: 12px;
+        background: #dff3ef;
+        border-radius: 999px;
+        animation: voice-wave 780ms ease-in-out infinite;
+      }
+
+      #voice-wave span:nth-child(2) { animation-delay: 100ms; }
+      #voice-wave span:nth-child(3) { animation-delay: 200ms; }
+      #voice-wave span:nth-child(4) { animation-delay: 300ms; }
+
+      #voice-copy {
+        font-size: 15px;
+        font-weight: 780;
+      }
+
+      #voice-hint {
+        margin-top: 6px;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 12px;
+      }
+
+      @keyframes voice-wave {
+        0%, 100% { height: 10px; }
+        50% { height: 30px; }
       }
 
       @keyframes panel-enter {
@@ -1012,8 +1144,15 @@
           enterkeyhint="send"
           maxlength="2000"
         />
+        <div id="hold-label">按住说话</div>
+        <button id="voice" type="button" title="按住说话" aria-label="按住说话">🎙</button>
         <button id="send" type="submit">发送</button>
       </form>
+      <div id="voice-sheet" aria-hidden="true">
+        <div id="voice-wave"><span></span><span></span><span></span><span></span></div>
+        <div id="voice-copy">正在录音</div>
+        <div id="voice-hint">上移取消，松手发送</div>
+      </div>
       <span id="state-announcer" class="sr-only" aria-live="polite"></span>
     </section>
   `;
@@ -1022,6 +1161,11 @@
   var panel = shadow.getElementById("panel");
   var messages = shadow.getElementById("messages");
   var input = shadow.getElementById("input");
+  var holdLabel = shadow.getElementById("hold-label");
+  var voice = shadow.getElementById("voice");
+  var voiceSheet = shadow.getElementById("voice-sheet");
+  var voiceCopy = shadow.getElementById("voice-copy");
+  var voiceHint = shadow.getElementById("voice-hint");
   var send = shadow.getElementById("send");
   var close = shadow.getElementById("close");
   var composer = shadow.getElementById("composer");
@@ -1060,6 +1204,13 @@
   var reducedMotion = window.matchMedia
     ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
     : false;
+  var mediaRecorder = null;
+  var mediaStream = null;
+  var audioChunks = [];
+  var voicePointerId = null;
+  var voiceStartY = 0;
+  var voicePressing = false;
+  var voiceCanceled = false;
 
   function clearStateTimers() {
     window.clearTimeout(stateResetTimer);
@@ -1482,6 +1633,7 @@
     bubble.textContent = text;
     messages.appendChild(bubble);
     messages.scrollTop = messages.scrollHeight;
+    return bubble;
   }
 
   function friendlyError(error, status) {
@@ -1509,6 +1661,186 @@
     });
   }
 
+  function appendToBubble(bubble, text) {
+    bubble.textContent += text;
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function parseSseBlock(block) {
+    var eventName = "message";
+    var dataLines = [];
+    block.split("\n").forEach(function (line) {
+      if (line.indexOf("event:") === 0) eventName = line.slice(6).trim();
+      if (line.indexOf("data:") === 0) dataLines.push(line.slice(5).trim());
+    });
+    return { eventName: eventName, data: dataLines.join("\n") };
+  }
+
+  async function readAnswerStream(response, state) {
+    if (!response.body) throw new Error("当前浏览器不支持流式读取回答");
+
+    var reader = response.body.getReader();
+    var decoder = new TextDecoder("utf-8");
+    var buffer = "";
+    while (true) {
+      var result = await reader.read();
+      if (result.done) break;
+      buffer += decoder.decode(result.value, { stream: true });
+      var blocks = buffer.split("\n\n");
+      buffer = blocks.pop() || "";
+      blocks.forEach(function (block) {
+        var parsed = parseSseBlock(block);
+        if (!parsed.data) return;
+        var payload = JSON.parse(parsed.data);
+        if (parsed.eventName === "transcript") {
+          addBubble(payload.transcript || "语音问题", "user");
+          state.answerBubble = addBubble("", "bot");
+        } else if (parsed.eventName === "delta") {
+          if (!state.answerBubble) state.answerBubble = addBubble("", "bot");
+          appendToBubble(state.answerBubble, payload.content || "");
+        } else if (parsed.eventName === "error") {
+          throw new Error(payload.detail || "问答服务返回错误");
+        }
+      });
+    }
+  }
+
+  async function sendTextFallback(text) {
+    var response = await fetch(API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        medicine_id: medicineId,
+        session_id: sessionId,
+        message: text,
+        context: context,
+      }),
+    });
+    var data = await response.json().catch(function () {
+      return {};
+    });
+    if (!response.ok) {
+      throw new Error(data.detail || "服务返回错误（" + response.status + "）");
+    }
+
+    var answer = data.answer || data.reply || "这次没有收到回答，请稍后重试。";
+    var bubble = addBubble("", "bot");
+    for (var index = 0; index < answer.length; index += 1) {
+      appendToBubble(bubble, answer[index]);
+      if (!reducedMotion) {
+        await new Promise(function (resolve) {
+          window.setTimeout(resolve, 14);
+        });
+      }
+    }
+  }
+
+  function getRecordingMimeType() {
+    var candidates = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/wav"];
+    if (!window.MediaRecorder || !MediaRecorder.isTypeSupported) return "";
+    for (var index = 0; index < candidates.length; index += 1) {
+      if (MediaRecorder.isTypeSupported(candidates[index])) return candidates[index];
+    }
+    return "";
+  }
+
+  function extensionForMimeType(mimeType) {
+    if (mimeType.indexOf("mp4") >= 0) return "m4a";
+    if (mimeType.indexOf("wav") >= 0) return "wav";
+    return "webm";
+  }
+
+  function stopMediaStream() {
+    if (!mediaStream) return;
+    mediaStream.getTracks().forEach(function (track) {
+      track.stop();
+    });
+    mediaStream = null;
+  }
+
+  function setVoiceUi(active, canceling) {
+    composer.classList.toggle("recording", active);
+    composer.classList.toggle("canceling", Boolean(canceling));
+    voice.classList.toggle("recording", active);
+    voiceSheet.classList.toggle("show", active);
+    voiceSheet.classList.toggle("canceling", Boolean(canceling));
+    if (holdLabel) holdLabel.textContent = canceling ? "松手取消" : "按住说话";
+    voiceCopy.textContent = canceling ? "松手取消" : "正在录音";
+    voiceHint.textContent = canceling ? "松开手指，取消发送" : "上移取消，松手发送";
+  }
+
+  async function sendVoice(blob, mimeType) {
+    var extension = extensionForMimeType(mimeType || blob.type || "audio/webm");
+    var formData = new FormData();
+    formData.append("medicine_id", medicineId);
+    formData.append("session_id", sessionId);
+    formData.append("audio", blob, "voice." + extension);
+
+    var response = await fetch(VOICE_API, { method: "POST", body: formData });
+    if (!response.ok) {
+      var data = await response.json().catch(function () {
+        return {};
+      });
+      throw new Error(data.detail || "服务返回错误（" + response.status + "）");
+    }
+    await readAnswerStream(response, { answerBubble: null });
+  }
+
+  async function startVoiceRecording() {
+    if (!window.isSecureContext) {
+      throw new Error("手机录音需要 HTTPS 页面；请用 HTTPS 域名访问。");
+    }
+    if (!navigator.mediaDevices || !window.MediaRecorder) {
+      throw new Error("当前浏览器不支持录音上传。");
+    }
+
+    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioChunks = [];
+    var mimeType = getRecordingMimeType();
+    mediaRecorder = new MediaRecorder(
+      mediaStream,
+      mimeType ? { mimeType: mimeType } : undefined,
+    );
+    mediaRecorder.addEventListener("dataavailable", function (event) {
+      if (event.data && event.data.size > 0) audioChunks.push(event.data);
+    });
+    mediaRecorder.addEventListener("stop", function () {
+      var shouldCancel = voiceCanceled;
+      var type = mimeType || mediaRecorder.mimeType || "audio/webm";
+      var chunks = audioChunks.slice();
+      audioChunks = [];
+      stopMediaStream();
+      setVoiceUi(false, false);
+      if (shouldCancel || !chunks.length) {
+        setAssistantState("listening", shouldCancel ? "已取消语音发送" : "正在聆听你的问题", 1200);
+        return;
+      }
+
+      send.disabled = true;
+      voice.disabled = true;
+      input.disabled = true;
+      panel.setAttribute("aria-busy", "true");
+      setAssistantState("thinking", "正在识别语音并读取资料");
+      void sendVoice(new Blob(chunks, { type: type }), type)
+        .then(function () {
+          setAssistantState("success", "回答已送达", 1500);
+        })
+        .catch(function (error) {
+          var errorCopy = friendlyError(error, 0);
+          addBubble(errorCopy, "bot");
+          setAssistantState("error", errorCopy, 2800);
+        })
+        .finally(function () {
+          send.disabled = false;
+          voice.disabled = false;
+          input.disabled = false;
+          panel.removeAttribute("aria-busy");
+          if (panel.classList.contains("open")) input.focus();
+        });
+    });
+    mediaRecorder.start(1000);
+  }
+
   async function sendMessage() {
     var text = input.value.trim();
     if (!text || send.disabled) return;
@@ -1525,7 +1857,7 @@
 
     var responseStatus = 0;
     try {
-      var response = await fetch(API, {
+      var response = await fetch(STREAM_API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1536,16 +1868,23 @@
         }),
       });
       responseStatus = response.status;
-      var data = await response.json().catch(function () {
-        return {};
-      });
       if (!response.ok) {
+        if (response.status === 404 || response.status === 405) {
+          setAssistantState("answering", "正在组织回答");
+          await answeringPause();
+          await sendTextFallback(text);
+          setAssistantState("success", "回答已送达", 1500);
+          return;
+        }
+        var data = await response.json().catch(function () {
+          return {};
+        });
         throw new Error(data.detail || "服务返回错误（" + response.status + "）");
       }
 
       setAssistantState("answering", "正在组织回答");
       await answeringPause();
-      addBubble(data.answer || data.reply || "这次没有收到回答，请稍后重试。", "bot");
+      await readAnswerStream(response, { answerBubble: null });
       setAssistantState("success", "回答已送达", 1500);
     } catch (error) {
       var errorCopy = friendlyError(error, responseStatus);
@@ -1559,6 +1898,58 @@
     }
   }
 
+  voice.addEventListener("pointerdown", function (event) {
+    if (send.disabled || voice.disabled) return;
+    event.preventDefault();
+    voicePointerId = event.pointerId;
+    voiceStartY = event.clientY;
+    voicePressing = true;
+    voiceCanceled = false;
+    voice.setPointerCapture(event.pointerId);
+    setVoiceUi(true, false);
+    setAssistantState("listening", "正在录音，上移可取消");
+    void startVoiceRecording().catch(function (error) {
+      voicePressing = false;
+      voicePointerId = null;
+      voiceCanceled = false;
+      stopMediaStream();
+      setVoiceUi(false, false);
+      var errorCopy = friendlyError(error, 0);
+      addBubble(errorCopy, "bot");
+      setAssistantState("error", errorCopy, 2800);
+    });
+  });
+
+  voice.addEventListener("pointermove", function (event) {
+    if (!voicePressing || voicePointerId !== event.pointerId) return;
+    voiceCanceled = voiceStartY - event.clientY > 56;
+    setVoiceUi(true, voiceCanceled);
+  });
+
+  function finishVoicePress(event, cancel) {
+    if (!voicePressing || voicePointerId !== event.pointerId) return;
+    voicePressing = false;
+    voiceCanceled = cancel || voiceCanceled;
+    if (voice.hasPointerCapture(event.pointerId)) {
+      voice.releasePointerCapture(event.pointerId);
+    }
+    voicePointerId = null;
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+      mediaRecorder.stop();
+    } else {
+      stopMediaStream();
+      setVoiceUi(false, false);
+    }
+  }
+
+  voice.addEventListener("pointerup", function (event) {
+    finishVoicePress(event, false);
+  });
+
+  voice.addEventListener("pointercancel", function (event) {
+    finishVoicePress(event, true);
+  });
+
   composer.addEventListener("submit", function (event) {
     event.preventDefault();
     void sendMessage();
@@ -1567,6 +1958,8 @@
   var removalObserver = new MutationObserver(function () {
     if (host.isConnected) return;
     clearStateTimers();
+    if (mediaRecorder && mediaRecorder.state !== "inactive") mediaRecorder.stop();
+    stopMediaStream();
     lifecycle.abort();
     removalObserver.disconnect();
   });
