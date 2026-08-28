@@ -49,6 +49,22 @@ def test_chat_without_llm_config(client):
     assert response.json()["detail"] == "LLM service is not configured"
 
 
+def test_voice_chat_without_stt_config(client):
+    session = client.post(
+        "/api/chat/sessions", json={"medicine_id": "medicine-001"}
+    ).json()
+    response = client.post(
+        "/api/chat/voice",
+        data={
+            "medicine_id": "medicine-001",
+            "session_id": session["session_id"],
+        },
+        files={"audio": ("voice.webm", b"fake-audio", "audio/webm")},
+    )
+    assert response.status_code == 503
+    assert response.json()["detail"] == "Speech-to-text service is not configured"
+
+
 def test_session_medicine_mismatch_is_rejected(client):
     session = client.post(
         "/api/chat/sessions", json={"medicine_id": "medicine-001"}
