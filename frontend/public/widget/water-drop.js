@@ -247,44 +247,37 @@
         width: 106px;
         height: 106px;
         display: block;
-        overflow: hidden;
-        background: #dfe9d7;
-        border: 2px solid rgba(255, 255, 255, 0.9);
-        border-radius: 29px 29px 36px 36px;
-        box-shadow:
-          10px 18px 38px rgba(37, 56, 43, 0.28),
-          inset 1px 1px 0 rgba(255, 255, 255, 0.18);
+        overflow: visible;
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+        filter: drop-shadow(0 16px 18px rgba(37, 56, 43, 0.24));
         isolation: isolate;
         transition:
-          box-shadow 240ms ease,
           filter 240ms ease,
           transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
       }
 
       #portrait::before {
-        position: absolute;
-        z-index: 2;
-        inset: 0;
-        background: linear-gradient(115deg, transparent 18%, rgba(255, 255, 255, 0.14) 43%, transparent 62%);
-        content: "";
-        pointer-events: none;
+        display: none;
       }
 
       #portrait::after {
         position: absolute;
         z-index: 3;
-        inset: 2px;
+        inset: 10px 9px 7px;
         border: 1px solid transparent;
-        border-radius: inherit;
+        border-radius: 48% 52% 44% 56% / 58% 48% 52% 42%;
         content: "";
         pointer-events: none;
       }
 
       #portrait img {
         position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
+        top: -20%;
+        left: -20%;
+        width: 140%;
+        height: 140%;
         max-width: none;
         display: block;
         object-fit: cover;
@@ -293,20 +286,19 @@
 
       #header-avatar img {
         position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
+        top: -20%;
+        left: -20%;
+        width: 140%;
+        height: 140%;
         display: block;
         object-fit: cover;
         pointer-events: none;
       }
 
-      #portrait .herb-layer {
-        z-index: 1;
-        clip-path: polygon(52% 0, 100% 0, 100% 48%, 58% 50%);
-        transform-origin: 78% 30%;
-        animation: tina-herb-sway 9s ease-in-out infinite;
-      }
+      /* The source artwork already contains the dialogue bubble and herb;
+         keep one unmodified copy in the floating entry to avoid a doubled
+         branch while the full artwork remains available in the panel. */
+      #portrait .herb-layer { display: none; }
 
       #fab:focus-visible {
         outline: 3px solid var(--accent-soft);
@@ -355,9 +347,7 @@
       }
 
       #fab[data-state="notice"] #portrait {
-        box-shadow:
-          14px 22px 48px rgba(0, 0, 0, 0.38),
-          0 0 28px rgba(169, 200, 185, 0.19);
+        filter: drop-shadow(14px 22px 30px rgba(0, 0, 0, 0.24));
         transform: translateY(-3px) rotate(-1.5deg);
       }
 
@@ -367,9 +357,7 @@
       }
 
       #fab[data-state="hover"] #portrait {
-        box-shadow:
-          16px 25px 54px rgba(0, 0, 0, 0.4),
-          0 0 30px rgba(169, 200, 185, 0.16);
+        filter: drop-shadow(16px 25px 34px rgba(0, 0, 0, 0.27));
         transform: translateY(-4px) rotate(1deg);
       }
 
@@ -382,7 +370,7 @@
       }
 
       #fab[data-state="dragging"] #portrait {
-        box-shadow: 18px 28px 60px rgba(0, 0, 0, 0.44);
+        filter: drop-shadow(18px 28px 38px rgba(0, 0, 0, 0.3));
         transform: rotate(var(--drag-angle, 0deg)) scaleX(1.06) scaleY(0.94);
       }
 
@@ -501,10 +489,10 @@
         width: 50px;
         height: 50px;
         flex: 0 0 50px;
-        overflow: hidden;
-        background: #dfe9d7;
-        border: 1px solid rgba(255, 255, 255, 0.9);
-        border-radius: 15px 15px 18px 18px;
+        overflow: visible;
+        background: transparent;
+        border: 0;
+        border-radius: 0;
       }
 
       #header-copy {

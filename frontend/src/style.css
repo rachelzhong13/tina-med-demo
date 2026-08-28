@@ -1796,6 +1796,20 @@ dd {
     display: none;
   }
 
+  /* Keep the section number in its rail so hiding the micro label never
+     collapses the title into the former 34px index column. */
+  .medicine-experience .section-heading {
+    grid-template-columns: 34px minmax(0, 1fr);
+  }
+
+  .medicine-experience .section-heading > .section-index {
+    display: block;
+  }
+
+  .medicine-experience .section-heading h2 {
+    grid-column: 2;
+  }
+
   .usage-composition {
     grid-template-columns: minmax(0, 0.64fr) minmax(0, 1.36fr);
   }
@@ -2729,6 +2743,7 @@ body[data-tina-variant="oriental-editorial"] .brand-orbit {
   background: transparent !important;
   border: 0;
   border-bottom: 1px solid var(--continuity-line);
+  scroll-margin-top: 24px;
 }
 
 .medicine-experience .section-shell {
