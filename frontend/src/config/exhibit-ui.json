@@ -1,248 +1,58 @@
 {
   "$schema": "./exhibit-ui.schema.json",
-  "version": 1,
-  "defaultVariant": "clinical",
-  "medicines": {
-    "medicine-001": {
-      "defaultVariant": "clinical",
-      "availableVariants": ["clinical", "companion", "editorial"]
-    },
-    "medicine-002": {
-      "defaultVariant": "companion",
-      "availableVariants": ["clinical", "companion", "editorial"]
-    },
-    "medicine-003": {
-      "defaultVariant": "editorial",
-      "availableVariants": ["clinical", "companion", "editorial"]
-    }
+  "version": 3,
+  "defaultVariantByMedicine": {
+    "medicine-001": "botanical-minimal",
+    "medicine-002": "oriental-editorial",
+    "medicine-003": "botanical-future"
   },
   "variants": {
-    "clinical": {
-      "name": "Clinical Precision",
-      "label": "临床精确",
-      "description": "以检验标签和临床记录为参照，先给结论，再展开依据。",
-      "assistant": {
-        "mode": "supporting",
-        "greeting": "需要核对哪一项样品资料？"
-      },
-      "hero": {
-        "leadField": "indications",
-        "factFields": ["dosage_form", "specification", "package_description"],
-        "visual": "precision-pack"
-      },
+    "botanical-minimal": {
+      "id": "botanical-minimal",
+      "name": "Botanical Minimal",
+      "label": "草本留白",
+      "description": "以温润纸色、单株草本线稿与克制留白构成安静的现代植物科学体验。",
+      "assistant": { "mode": "botanical-guide", "greeting": "你好，我是 TINA。轻触我，一起读懂这份虚构草本样品资料。" },
+      "hero": { "leadField": "description", "factFields": ["specification", "dosage_form", "storage"], "visual": "botanical-specimen" },
       "sections": [
-        {
-          "id": "essentials",
-          "label": "样品规格",
-          "visible": true,
-          "priority": 100,
-          "order": 10,
-          "presentation": "fact-grid",
-          "interactionRole": "read",
-          "fields": ["dosage_form", "specification", "package_description", "storage"]
-        },
-        {
-          "id": "purpose",
-          "label": "适用场景",
-          "visible": true,
-          "priority": 95,
-          "order": 20,
-          "presentation": "feature",
-          "interactionRole": "assistant-context",
-          "fields": ["indications"]
-        },
-        {
-          "id": "usage",
-          "label": "模拟使用方式",
-          "visible": true,
-          "priority": 90,
-          "order": 30,
-          "presentation": "steps",
-          "interactionRole": "assistant-context",
-          "fields": ["usage"]
-        },
-        {
-          "id": "safety",
-          "label": "重要提醒",
-          "visible": true,
-          "priority": 98,
-          "order": 40,
-          "presentation": "warning",
-          "interactionRole": "read",
-          "fields": ["warnings", "contraindications"]
-        },
-        {
-          "id": "profile",
-          "label": "样品说明",
-          "visible": true,
-          "priority": 60,
-          "order": 50,
-          "presentation": "story",
-          "interactionRole": "read",
-          "fields": ["description", "appearance"]
-        },
-        {
-          "id": "traceability",
-          "label": "追溯信息",
-          "visible": true,
-          "priority": 30,
-          "order": 60,
-          "presentation": "metadata",
-          "interactionRole": "progressive",
-          "fields": ["manufacturer", "approval_number", "barcode", "source"]
-        }
+        { "id": "purpose", "label": "草本使用场景", "visible": true, "priority": 100, "order": 10, "presentation": "botanical-prose", "interactionRole": "assistant-context", "fields": ["indications"] },
+        { "id": "profile", "label": "植物与形态", "visible": true, "priority": 88, "order": 20, "presentation": "herbarium-story", "interactionRole": "read", "fields": ["description", "appearance"] },
+        { "id": "usage", "label": "模拟使用节奏", "visible": true, "priority": 92, "order": 30, "presentation": "quiet-usage", "interactionRole": "assistant-context", "fields": ["usage"] },
+        { "id": "essentials", "label": "形式与保存", "visible": true, "priority": 78, "order": 40, "presentation": "specimen-ledger", "interactionRole": "read", "fields": ["dosage_form", "specification", "package_description", "storage"] },
+        { "id": "safety", "label": "清楚的安全边界", "visible": true, "priority": 100, "order": 50, "presentation": "safety-note", "interactionRole": "read", "fields": ["warnings", "contraindications"] },
+        { "id": "traceability", "label": "演示档案", "visible": true, "priority": 35, "order": 60, "presentation": "archive", "interactionRole": "progressive", "fields": ["manufacturer", "approval_number", "barcode", "source"] }
       ]
     },
-    "companion": {
-      "name": "TINA Companion",
-      "label": "TINA 陪伴",
-      "description": "以现场对话和轻量护理卡为参照，让小水滴成为有分寸的陪伴角色。",
-      "assistant": {
-        "mode": "character",
-        "greeting": "你好，我可以陪你读懂这份展品资料。"
-      },
-      "hero": {
-        "leadField": "description",
-        "factFields": ["specification", "usage"],
-        "visual": "care-object"
-      },
+    "oriental-editorial": {
+      "id": "oriental-editorial",
+      "name": "Oriental Editorial",
+      "label": "东方图鉴",
+      "description": "借鉴现代植物图鉴与艺术书，以非对称网格、大字和朱砂索引建立编辑感。",
+      "assistant": { "mode": "editorial-guide", "greeting": "你好，我是 TINA。这是一页现代草本图鉴，也可以随时向我追问。" },
+      "hero": { "leadField": "generic_name", "factFields": ["category", "specification", "package_description"], "visual": "editorial-herbarium" },
       "sections": [
-        {
-          "id": "purpose",
-          "label": "这件样品想表达什么",
-          "visible": true,
-          "priority": 100,
-          "order": 10,
-          "presentation": "care",
-          "interactionRole": "assistant-context",
-          "fields": ["indications"]
-        },
-        {
-          "id": "usage",
-          "label": "怎么理解模拟用法",
-          "visible": true,
-          "priority": 95,
-          "order": 20,
-          "presentation": "steps",
-          "interactionRole": "assistant-context",
-          "fields": ["usage"]
-        },
-        {
-          "id": "safety",
-          "label": "先记住这件事",
-          "visible": true,
-          "priority": 98,
-          "order": 30,
-          "presentation": "warning",
-          "interactionRole": "read",
-          "fields": ["warnings", "contraindications"]
-        },
-        {
-          "id": "profile",
-          "label": "样品故事",
-          "visible": true,
-          "priority": 75,
-          "order": 40,
-          "presentation": "story",
-          "interactionRole": "read",
-          "fields": ["description", "appearance"]
-        },
-        {
-          "id": "essentials",
-          "label": "包装里的信息",
-          "visible": true,
-          "priority": 65,
-          "order": 50,
-          "presentation": "fact-grid",
-          "interactionRole": "read",
-          "fields": ["dosage_form", "specification", "package_description", "storage"]
-        },
-        {
-          "id": "traceability",
-          "label": "完整追溯资料",
-          "visible": true,
-          "priority": 25,
-          "order": 60,
-          "presentation": "metadata",
-          "interactionRole": "progressive",
-          "fields": ["manufacturer", "approval_number", "barcode", "source"]
-        }
+        { "id": "profile", "label": "形态档案", "visible": true, "priority": 96, "order": 10, "presentation": "catalogue-story", "interactionRole": "read", "fields": ["appearance", "description"] },
+        { "id": "purpose", "label": "当代使用语境", "visible": true, "priority": 100, "order": 20, "presentation": "editorial-index", "interactionRole": "assistant-context", "fields": ["indications"] },
+        { "id": "essentials", "label": "对象索引", "visible": true, "priority": 82, "order": 30, "presentation": "catalogue-grid", "interactionRole": "read", "fields": ["dosage_form", "specification", "package_description", "storage"] },
+        { "id": "usage", "label": "一日节律", "visible": true, "priority": 94, "order": 40, "presentation": "vertical-usage", "interactionRole": "assistant-context", "fields": ["usage"] },
+        { "id": "safety", "label": "边界批注", "visible": true, "priority": 100, "order": 50, "presentation": "cinnabar-safety", "interactionRole": "read", "fields": ["warnings", "contraindications"] },
+        { "id": "traceability", "label": "卷末资料", "visible": true, "priority": 35, "order": 60, "presentation": "archive", "interactionRole": "progressive", "fields": ["manufacturer", "approval_number", "barcode", "source"] }
       ]
     },
-    "editorial": {
-      "name": "Pharmaceutical Editorial",
-      "label": "药品编辑设计",
-      "description": "以药盒标签、说明书折页和展品目录为参照，用尺度与留白建立记忆点。",
-      "assistant": {
-        "mode": "editorial-mark",
-        "greeting": "从目录中选一个问题，或直接告诉我你想了解什么。"
-      },
-      "hero": {
-        "leadField": "description",
-        "factFields": ["dosage_form", "specification"],
-        "visual": "label-study"
-      },
+    "botanical-future": {
+      "id": "botanical-future",
+      "name": "Botanical Future",
+      "label": "草本光学",
+      "description": "以深植物绿、玉质折射和缓慢漂浮的药材微粒，连接草本身份与展会冲击力。",
+      "assistant": { "mode": "future-guide", "greeting": "你好，我是 TINA。这里把草本样品放进了光学观察场，也可以直接问我。" },
+      "hero": { "leadField": "description", "factFields": ["specification", "dosage_form", "package_description"], "visual": "botanical-optical" },
       "sections": [
-        {
-          "id": "profile",
-          "label": "产品札记",
-          "visible": true,
-          "priority": 100,
-          "order": 10,
-          "presentation": "story",
-          "interactionRole": "read",
-          "fields": ["description", "appearance"]
-        },
-        {
-          "id": "purpose",
-          "label": "推荐场景",
-          "visible": true,
-          "priority": 95,
-          "order": 20,
-          "presentation": "feature",
-          "interactionRole": "assistant-context",
-          "fields": ["indications"]
-        },
-        {
-          "id": "usage",
-          "label": "使用注记",
-          "visible": true,
-          "priority": 90,
-          "order": 30,
-          "presentation": "steps",
-          "interactionRole": "assistant-context",
-          "fields": ["usage"]
-        },
-        {
-          "id": "essentials",
-          "label": "形式与包装",
-          "visible": true,
-          "priority": 70,
-          "order": 40,
-          "presentation": "fact-grid",
-          "interactionRole": "read",
-          "fields": ["dosage_form", "specification", "package_description", "storage"]
-        },
-        {
-          "id": "safety",
-          "label": "边界声明",
-          "visible": true,
-          "priority": 98,
-          "order": 50,
-          "presentation": "warning",
-          "interactionRole": "read",
-          "fields": ["warnings", "contraindications"]
-        },
-        {
-          "id": "traceability",
-          "label": "样品档案",
-          "visible": true,
-          "priority": 30,
-          "order": 60,
-          "presentation": "metadata",
-          "interactionRole": "progressive",
-          "fields": ["manufacturer", "approval_number", "barcode", "source"]
-        }
+        { "id": "purpose", "label": "草本信号", "visible": true, "priority": 100, "order": 10, "presentation": "luminous-lead", "interactionRole": "assistant-context", "fields": ["indications"] },
+        { "id": "usage", "label": "节律脉冲", "visible": true, "priority": 96, "order": 20, "presentation": "orbit-usage", "interactionRole": "assistant-context", "fields": ["usage"] },
+        { "id": "safety", "label": "透明边界", "visible": true, "priority": 100, "order": 30, "presentation": "glass-safety", "interactionRole": "read", "fields": ["warnings", "contraindications"] },
+        { "id": "profile", "label": "微观形态", "visible": true, "priority": 86, "order": 40, "presentation": "translucent-story", "interactionRole": "read", "fields": ["description", "appearance"] },
+        { "id": "essentials", "label": "样品参数", "visible": true, "priority": 80, "order": 50, "presentation": "optical-ledger", "interactionRole": "read", "fields": ["dosage_form", "specification", "package_description", "storage"] },
+        { "id": "traceability", "label": "演示档案", "visible": true, "priority": 35, "order": 60, "presentation": "archive", "interactionRole": "progressive", "fields": ["manufacturer", "approval_number", "barcode", "source"] }
       ]
     }
   }

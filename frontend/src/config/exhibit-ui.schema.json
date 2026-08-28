@@ -4,135 +4,27 @@
   "title": "TINA exhibition UI configuration",
   "type": "object",
   "additionalProperties": false,
-  "required": ["version", "defaultVariant", "medicines", "variants"],
+  "required": ["version", "defaultVariantByMedicine", "variants"],
   "properties": {
     "$schema": { "type": "string", "minLength": 1 },
-    "version": { "const": 1 },
-    "defaultVariant": { "$ref": "#/$defs/variantId" },
-    "medicines": {
-      "type": "object",
-      "additionalProperties": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": ["defaultVariant", "availableVariants"],
-        "properties": {
-          "defaultVariant": { "$ref": "#/$defs/variantId" },
-          "availableVariants": {
-            "type": "array",
-            "minItems": 1,
-            "uniqueItems": true,
-            "items": { "$ref": "#/$defs/variantId" }
-          }
-        }
-      }
-    },
-    "variants": {
-      "type": "object",
-      "required": ["clinical", "companion", "editorial"],
-      "additionalProperties": false,
-      "properties": {
-        "clinical": { "$ref": "#/$defs/variant" },
-        "companion": { "$ref": "#/$defs/variant" },
-        "editorial": { "$ref": "#/$defs/variant" }
-      }
-    }
+    "version": { "const": 3 },
+    "defaultVariantByMedicine": { "type": "object", "additionalProperties": { "$ref": "#/$defs/variantId" } },
+    "variants": { "type": "object", "required": ["botanical-minimal", "oriental-editorial", "botanical-future"], "additionalProperties": { "$ref": "#/$defs/variant" } }
   },
   "$defs": {
-    "variantId": {
-      "enum": ["clinical", "companion", "editorial"]
-    },
-    "medicineField": {
-      "enum": [
-        "generic_name",
-        "manufacturer",
-        "approval_number",
-        "barcode",
-        "category",
-        "dosage_form",
-        "specification",
-        "package_description",
-        "appearance",
-        "storage",
-        "indications",
-        "usage",
-        "contraindications",
-        "warnings",
-        "description",
-        "source"
-      ]
-    },
-    "assistant": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["mode", "greeting"],
-      "properties": {
-        "mode": { "enum": ["supporting", "character", "editorial-mark"] },
-        "greeting": { "type": "string", "minLength": 1 }
-      }
-    },
-    "hero": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["leadField", "factFields", "visual"],
-      "properties": {
-        "leadField": { "$ref": "#/$defs/medicineField" },
-        "factFields": {
-          "type": "array",
-          "minItems": 1,
-          "maxItems": 4,
-          "uniqueItems": true,
-          "items": { "$ref": "#/$defs/medicineField" }
-        },
-        "visual": { "enum": ["precision-pack", "care-object", "label-study"] }
-      }
-    },
+    "variantId": { "enum": ["botanical-minimal", "oriental-editorial", "botanical-future"] },
+    "medicineField": { "enum": ["generic_name", "manufacturer", "approval_number", "barcode", "category", "dosage_form", "specification", "package_description", "appearance", "storage", "indications", "usage", "contraindications", "warnings", "description", "source"] },
+    "assistant": { "type": "object", "additionalProperties": false, "required": ["mode", "greeting"], "properties": { "mode": { "enum": ["botanical-guide", "editorial-guide", "future-guide"] }, "greeting": { "type": "string", "minLength": 1 } } },
+    "hero": { "type": "object", "additionalProperties": false, "required": ["leadField", "factFields", "visual"], "properties": { "leadField": { "$ref": "#/$defs/medicineField" }, "factFields": { "type": "array", "minItems": 1, "maxItems": 3, "uniqueItems": true, "items": { "$ref": "#/$defs/medicineField" } }, "visual": { "enum": ["botanical-specimen", "editorial-herbarium", "botanical-optical"] } } },
     "section": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "id",
-        "label",
-        "visible",
-        "priority",
-        "order",
-        "presentation",
-        "interactionRole",
-        "fields"
-      ],
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "label", "visible", "priority", "order", "presentation", "interactionRole", "fields"],
       "properties": {
-        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
-        "label": { "type": "string", "minLength": 1 },
-        "visible": { "type": "boolean" },
-        "priority": { "type": "integer", "minimum": 0, "maximum": 100 },
-        "order": { "type": "integer", "minimum": 0 },
-        "presentation": {
-          "enum": ["fact-grid", "feature", "care", "steps", "warning", "story", "metadata"]
-        },
-        "interactionRole": { "enum": ["read", "progressive", "assistant-context"] },
-        "fields": {
-          "type": "array",
-          "minItems": 1,
-          "uniqueItems": true,
-          "items": { "$ref": "#/$defs/medicineField" }
-        }
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" }, "label": { "type": "string", "minLength": 1 }, "visible": { "type": "boolean" }, "priority": { "type": "integer", "minimum": 0, "maximum": 100 }, "order": { "type": "integer", "minimum": 0 },
+        "presentation": { "enum": ["botanical-prose", "herbarium-story", "quiet-usage", "specimen-ledger", "safety-note", "editorial-index", "catalogue-story", "catalogue-grid", "vertical-usage", "cinnabar-safety", "luminous-lead", "orbit-usage", "glass-safety", "translucent-story", "optical-ledger", "archive"] },
+        "interactionRole": { "enum": ["read", "progressive", "assistant-context"] }, "fields": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/medicineField" } }
       }
     },
-    "variant": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["name", "label", "description", "assistant", "hero", "sections"],
-      "properties": {
-        "name": { "type": "string", "minLength": 1 },
-        "label": { "type": "string", "minLength": 1 },
-        "description": { "type": "string", "minLength": 1 },
-        "assistant": { "$ref": "#/$defs/assistant" },
-        "hero": { "$ref": "#/$defs/hero" },
-        "sections": {
-          "type": "array",
-          "minItems": 1,
-          "items": { "$ref": "#/$defs/section" }
-        }
-      }
-    }
+    "variant": { "type": "object", "additionalProperties": false, "required": ["id", "name", "label", "description", "assistant", "hero", "sections"], "properties": { "id": { "$ref": "#/$defs/variantId" }, "name": { "type": "string", "minLength": 1 }, "label": { "type": "string", "minLength": 1 }, "description": { "type": "string", "minLength": 1 }, "assistant": { "$ref": "#/$defs/assistant" }, "hero": { "$ref": "#/$defs/hero" }, "sections": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/section" } } } }
   }
 }
