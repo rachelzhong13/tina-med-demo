@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#238cf0">
+  <title>TINA 药品详情</title>
+  <style>
+    :root {
+      --blue: #238cf0;
+      --blue-strong: #1478de;
+      --blue-soft: #eaf5ff;
+      --green: #13b77a;
+      --green-soft: #eafaf3;
+      --ink: #1a2738;
+      --body: #53667c;
+      --muted: #8c9cad;
+      --line: #e5ecf2;
+      --canvas: #f2f6f9;
+      --surface: #ffffff;
+      --radius: 12px;
+      --shadow: 0 8px 24px rgba(35, 69, 105, 0.08);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      min-width: 320px;
+      min-height: 100%;
+      background: #dde7ef;
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100%;
+      margin: 0;
+      color: var(--ink);
+      background: #dde7ef;
+      font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif;
+      letter-spacing: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button { font: inherit; }
+
+    .mobile-app {
+      position: relative;
+      width: 100%;
+      max-width: 430px;
+      min-height: 100vh;
+      margin: 0 auto;
+      overflow: hidden;
+      background: var(--canvas);
+      box-shadow: 0 0 34px rgba(39, 67, 94, 0.13);
+    }
+
+    .view {
+      display: none;
+      min-height: 100vh;
+      padding-bottom: calc(32px + env(safe-area-inset-bottom));
+    }
+
+    .view.is-active { display: block; }
+
+    .app-header {
+      position: relative;
+      padding-top: env(safe-area-inset-top);
+      color: white;
+      background: var(--blue);
+    }
+
+    .nav-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 58px;
+      padding: 0 62px;
+    }
+
+    .nav-title {
+      overflow: hidden;
+      font-size: 15px;
+      font-weight: 600;
+      text-align: center;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .icon-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: 0;
+      border-radius: 50%;
+      color: inherit;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .icon-button:active { background: rgba(255,255,255,0.14); }
+
+
+    .nav-bar > .icon-button {
+      position: absolute;
+      left: 8px;
+    }
+
+    .quick-tools {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px 13px 12px;
+    }
+
+    .tool-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-height: 26px;
+      padding: 0 9px;
+      border: 0;
+      border-radius: 13px;
+      color: var(--blue-strong);
+      background: white;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .tool-pill.secondary {
+      border: 1px solid rgba(255,255,255,0.58);
+      color: white;
+      background: rgba(30, 121, 218, 0.34);
+    }
+
+    .product-summary {
+      position: relative;
+      min-height: 150px;
+      margin: 0 10px;
+      padding: 17px 146px 18px 16px;
+      overflow: hidden;
+      border-radius: 11px 11px 0 0;
+      background: white;
+    }
+
+    .product-summary::before {
+      content: "";
+      position: absolute;
+      top: -33px;
+      right: -22px;
+      width: 154px;
+      height: 154px;
+      border-radius: 50%;
+      background: #eaf6ff;
+    }
+
+    .product-summary h1 {
+      position: relative;
+      z-index: 2;
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .product-subtitle {
+      position: relative;
+      z-index: 2;
+      margin: 4px 0 0;
+      color: var(--body);
+      font-size: 12px;
+    }
+
+    .product-meta {
+      position: relative;
+      z-index: 2;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.75;
+    }
+
+    .tags {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 8px;
+    }
+
+    .tag {
+      padding: 3px 7px;
+      border: 1px solid #dce5ed;
+      border-radius: 4px;
+      color: #738397;
+      background: #f8fafc;
+      font-size: 10px;
+    }
+
+    .medicine-box {
+      position: absolute;
+      z-index: 2;
+      top: 46px;
+      right: 17px;
+      width: 112px;
+      height: 80px;
+      filter: drop-shadow(0 10px 10px rgba(39, 79, 113, 0.14));
+      transform: rotate(3deg);
+    }
+
+    .box-front {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 94px;
+      height: 62px;
+      overflow: hidden;
+      border: 1px solid #dce5ec;
+      border-radius: 2px;
+      background: white;
+    }
+
+    .box-front::before {
+      content: "";
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 34px;
+      height: 100%;
+      background: #64b6f7;
+    }
+
+    .box-front::after {
+      content: "+";
+      position: absolute;
+      top: 8px;
+      right: 7px;
+      color: white;
+      font: 700 24px/1 Arial, sans-serif;
+    }
+
+    .box-side {
+      position: absolute;
+      left: 2px;
+      bottom: 4px;
+      width: 19px;
+      height: 57px;
+      border: 1px solid #d6e2eb;
+      background: #eef5f9;
+      clip-path: polygon(100% 0, 100% 100%, 0 86%, 0 12%);
+    }
+
+    .box-top {
+      position: absolute;
+      top: 10px;
+      left: 5px;
+      width: 99px;
+      height: 20px;
+      border: 1px solid #dce5ec;
+      background: #f8fbfd;
+      clip-path: polygon(12% 0, 100% 28%, 87% 100%, 0 72%);
+    }
+
+    .box-label {
+      position: absolute;
+      z-index: 3;
+      left: 30px;
+      bottom: 28px;
+      color: #286fae;
+      font-size: 7px;
+      font-weight: 700;
+    }
+
+    .content {
+      padding: 12px 10px 0;
+    }
+
+    .card {
+      overflow: hidden;
+      border: 1px solid rgba(218, 228, 236, 0.8);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .action-card {
+      position: relative;
+      z-index: 3;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      margin-top: -1px;
+      border-radius: 0 0 var(--radius) var(--radius);
+      box-shadow: 0 10px 24px rgba(35, 69, 105, 0.1);
+    }
+
+    .entry-button {
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      min-height: 70px;
+      padding: 10px 13px;
+      border: 0;
+      color: var(--ink);
+      background: white;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .entry-button.verify { color: var(--green); background: var(--green-soft); }
+
+    .entry-icon {
+      display: inline-flex;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+      width: 31px;
+      height: 31px;
+      margin-right: 9px;
+      border-radius: 8px;
+      color: white;
+      background: var(--green);
+    }
+
+    .entry-copy { min-width: 0; flex: 1; }
+    .entry-copy strong { display: block; overflow: hidden; font-size: 16px; text-overflow: ellipsis; white-space: nowrap; }
+    .entry-copy span { display: block; margin-top: 3px; color: #7d8c9b; font-size: 11px; }
+    .entry-button.verify .entry-copy span { color: #67a88c; }
+
+    .chevron {
+      flex: 0 0 auto;
+      width: 8px;
+      height: 8px;
+      margin-left: 6px;
+      border-top: 1.5px solid currentColor;
+      border-right: 1.5px solid currentColor;
+      transform: rotate(45deg);
+    }
+
+    .entry-button:active { filter: brightness(0.97); }
+
+    .section-card { margin-top: 12px; }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 49px;
+      margin: 0;
+      padding: 0 15px;
+      border-bottom: 1px solid var(--line);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .section-title span {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 400;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 49px;
+      padding: 0 15px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-heading h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .section-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 2px 0 12px;
+      border: 0;
+      color: var(--blue-strong);
+      background: transparent;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .section-link .chevron { width: 7px; height: 7px; }
+
+    .data-list { margin: 0; padding: 5px 15px; }
+
+    .data-row {
+      display: grid;
+      grid-template-columns: 98px minmax(0, 1fr);
+      gap: 12px;
+      padding: 11px 0;
+      border-bottom: 1px solid #edf2f6;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .data-row:last-child { border-bottom: 0; }
+    .data-row dt { color: var(--muted); }
+    .data-row dd { min-width: 0; margin: 0; color: #405267; overflow-wrap: anywhere; }
+
+    .trace-summary { padding: 10px 15px 13px; }
+
+    .trace-summary-item {
+      position: relative;
+      min-height: 48px;
+      padding: 7px 0 7px 31px;
+    }
+
+    .trace-summary-item:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      top: 25px;
+      bottom: -7px;
+      left: 8px;
+      width: 1px;
+      background: #cfe3f3;
+    }
+
+    .trace-summary-mark {
+      position: absolute;
+      top: 10px;
+      left: 1px;
+      width: 15px;
+      height: 15px;
+      border: 4px solid #dceefd;
+      border-radius: 50%;
+      background: var(--blue);
+    }
+
+    .trace-summary-item:first-child .trace-summary-mark {
+      border-color: #d5f4e7;
+      background: var(--green);
+    }
+
+    .trace-summary-item strong { display: block; font-size: 12px; }
+    .trace-summary-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; }
+
+    .demo-notice {
+      margin: 12px 0 0;
+      padding: 11px 13px;
+      border: 1px solid #dfeaf3;
+      border-radius: 8px;
+      color: #74869a;
+      background: #f7fbfe;
+      font-size: 10px;
+      line-height: 1.65;
+    }
+
+    .detail-header { position: sticky; top: 0; z-index: 10; box-shadow: 0 3px 12px rgba(18, 85, 153, 0.16); }
+
+    .detail-content { padding: 16px 10px 0; }
+
+    .result-hero {
+      padding: 27px 20px 23px;
+      text-align: center;
+    }
+
+    .result-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 58px;
+      height: 58px;
+      border-radius: 17px;
+      color: white;
+      background: var(--green);
+      box-shadow: 0 9px 20px rgba(19, 183, 122, 0.23);
+    }
+
+    .result-hero h1 { margin: 15px 0 0; font-size: 20px; }
+    .result-hero p { margin: 7px 0 0; color: var(--green); font-size: 12px; }
+
+    .scan-rank {
+      display: flex;
+      align-items: center;
+      margin: 0 15px 14px;
+      padding: 13px;
+      border-radius: 8px;
+      color: #355371;
+      background: var(--blue-soft);
+      font-size: 12px;
+    }
+
+    .rank-dot {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      border-radius: 50%;
+      color: white;
+      background: var(--blue);
+      font: 700 11px/1 Arial, sans-serif;
+    }
+
+    .timeline { padding: 5px 18px 16px; }
+
+    .timeline-item {
+      position: relative;
+      padding: 10px 0 18px 29px;
+    }
+
+    .timeline-item:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      top: 26px;
+      bottom: -2px;
+      left: 7px;
+      width: 1px;
+      background: #cfe2f3;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      top: 13px;
+      left: 0;
+      width: 15px;
+      height: 15px;
+      border: 4px solid #d9ecfb;
+      border-radius: 50%;
+      background: var(--blue);
+    }
+
+    .timeline-item.success .timeline-dot { border-color: #d5f4e7; background: var(--green); }
+    .timeline-item strong { display: block; font-size: 13px; }
+    .timeline-item p { margin: 5px 0 0; color: #718295; font-size: 11px; line-height: 1.65; }
+
+    .trace-code {
+      margin: 0 15px 14px;
+      padding: 14px;
+      border: 1px dashed #b9d9f4;
+      border-radius: 8px;
+      color: #3c536a;
+      background: #f6fbff;
+      font: 12px/1.6 ui-monospace, "SFMono-Regular", Consolas, monospace;
+      overflow-wrap: anywhere;
+    }
+
+    .source-note {
+      margin: 12px 0 0;
+      padding: 0 4px;
+      color: #94a2b1;
+      font-size: 10px;
+      line-height: 1.65;
+      text-align: center;
+    }
+
+    .icon { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+    .back-label { display: none; }
+
+    .mobile-app.care-mode {
+      --ink: #111b28;
+      --body: #2e4155;
+      --muted: #566a7e;
+      --line: #cfdbe5;
+      --canvas: #edf3f7;
+    }
+
+    .care-mode .nav-bar { min-height: 68px; padding-right: 90px; padding-left: 90px; }
+    .care-mode .nav-title { font-size: 19px; }
+    .care-mode .quick-tools { gap: 10px; padding: 6px 14px 16px; }
+    .care-mode .tool-pill { min-height: 50px; padding: 0 15px; border-radius: 8px; font-size: 17px; }
+    .care-mode .tool-pill .icon { width: 24px; height: 24px; }
+    .care-mode .product-summary { min-height: 224px; padding: 24px 138px 24px 20px; border-radius: 12px 12px 0 0; }
+    .care-mode .product-summary h1 { font-size: 27px; line-height: 1.4; }
+    .care-mode .product-subtitle { margin-top: 7px; font-size: 18px; line-height: 1.55; }
+    .care-mode .product-meta { margin-top: 15px; color: #465b70; font-size: 17px; line-height: 1.8; }
+    .care-mode .tags { display: none; }
+    .care-mode .medicine-box { top: 94px; right: 13px; transform: scale(0.98) rotate(3deg); }
+    .care-mode .content, .care-mode .detail-content { padding: 15px 12px 0; }
+    .care-mode .action-card { border-radius: 0 0 12px 12px; }
+    .care-mode .entry-button { min-height: 104px; padding: 15px 18px; }
+    .care-mode .entry-icon { width: 46px; height: 46px; margin-right: 13px; border-radius: 11px; }
+    .care-mode .entry-icon .icon { width: 27px; height: 27px; }
+    .care-mode .entry-copy strong { font-size: 23px; white-space: normal; }
+    .care-mode .entry-copy span { margin-top: 6px; color: #397b61; font-size: 17px; }
+    .care-mode .entry-button .chevron { width: 13px; height: 13px; border-width: 2px; }
+    .care-mode .section-card { margin-top: 16px; }
+    .care-mode .section-title, .care-mode .section-heading { min-height: 65px; padding: 0 18px; }
+    .care-mode .section-title, .care-mode .section-heading h2 { font-size: 22px; }
+    .care-mode .section-title span { display: none; }
+    .care-mode .section-link { min-height: 52px; color: #075fae; font-size: 16px; font-weight: 600; }
+    .care-mode .section-link .chevron { width: 10px; height: 10px; border-width: 2px; }
+    .care-mode .data-list { padding: 5px 18px; }
+    .care-mode .data-row { grid-template-columns: minmax(0, 1fr); gap: 5px; padding: 15px 0; font-size: 18px; line-height: 1.55; }
+    .care-mode .data-row dt { color: #53687d; font-size: 16px; }
+    .care-mode .data-row dd { color: #14273b; font-weight: 600; }
+    .care-mode .trace-summary { padding: 12px 18px 16px; }
+    .care-mode .trace-summary-item { min-height: 70px; padding: 10px 0 10px 40px; }
+    .care-mode .trace-summary-item:not(:last-child)::before { top: 32px; bottom: -10px; left: 10px; width: 2px; }
+    .care-mode .trace-summary-mark { top: 13px; width: 20px; height: 20px; border-width: 5px; }
+    .care-mode .trace-summary-item strong { font-size: 19px; }
+    .care-mode .trace-summary-item span { margin-top: 6px; font-size: 16px; }
+    .care-mode .demo-notice, .care-mode .source-note { padding: 14px; color: #475c71; font-size: 15px; line-height: 1.7; text-align: left; }
+    .care-mode .detail-header .icon-button { justify-self: start; width: 80px; border-radius: 8px; font-size: 17px; }
+    .care-mode .detail-header .icon-button .icon { width: 27px; height: 27px; }
+    .care-mode .back-label { display: inline; margin-left: 2px; }
+    .care-mode .result-hero { padding: 34px 20px 30px; }
+    .care-mode .result-icon { width: 70px; height: 70px; border-radius: 18px; }
+    .care-mode .result-icon .icon { width: 31px; height: 31px; }
+    .care-mode .result-hero h1 { margin-top: 18px; font-size: 27px; }
+    .care-mode .result-hero p { margin-top: 10px; font-size: 18px; }
+    .care-mode .scan-rank { margin: 0 18px 16px; padding: 16px; font-size: 18px; }
+    .care-mode .rank-dot { width: 28px; height: 28px; font-size: 15px; }
+    .care-mode .trace-code { margin: 4px 18px 17px; padding: 16px; font-size: 16px; }
+    .care-mode .timeline { padding: 8px 20px 18px; }
+    .care-mode .timeline-item { padding: 13px 0 23px 38px; }
+    .care-mode .timeline-item:not(:last-child)::before { top: 34px; left: 9px; width: 2px; }
+    .care-mode .timeline-dot { top: 17px; width: 19px; height: 19px; border-width: 5px; }
+    .care-mode .timeline-item strong { font-size: 19px; }
+    .care-mode .timeline-item p { margin-top: 7px; font-size: 16px; }
+
+    button:focus-visible {
+      outline: 3px solid rgba(18, 91, 169, 0.42);
+      outline-offset: -3px;
+    }
+
+    @media (max-width: 359px) {
+      .product-summary { padding-right: 126px; }
+      .medicine-box { right: 8px; transform: scale(0.88) rotate(3deg); transform-origin: right center; }
+      .entry-button { min-height: 58px; }
+      .care-mode .quick-tools { flex-direction: column; }
+      .care-mode .tool-pill { justify-content: center; width: 100%; }
+      .care-mode .product-summary { padding-right: 20px; }
+      .care-mode .medicine-box { display: none; }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .view.is-entering { animation: enter-view 180ms ease-out; }
+      @keyframes enter-view { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: none; } }
+    }
+
+    @media (min-width: 431px) {
+      .mobile-app { min-height: 100dvh; }
+    }
+  </style>
+</head>
+<body>
+  <main class="mobile-app" aria-live="polite">
+    <section class="view is-active" id="home-view" data-view="home" aria-labelledby="home-title">
+      <header class="app-header">
+        <div class="nav-bar">
+          <div class="nav-title" id="home-title">TINA 健康药箱</div>
+        </div>
+        <div class="quick-tools">
+          <button class="tool-pill" type="button" data-mode-toggle aria-pressed="false">切换大字版</button>
+          <button class="tool-pill secondary" type="button" data-speak aria-pressed="false">
+            <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4V5Z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
+            <span>语音播报</span>
+          </button>
+        </div>
+        <section class="product-summary" aria-label="药品摘要">
+          <h1>演示清润片 DEMO</h1>
+          <p class="product-subtitle">演示清润片（虚构）</p>
+          <div class="product-meta">10mg × 7片<br>DEMO 虚构企业</div>
+          <div class="tags"><span class="tag">演示药</span><span class="tag">片剂</span><span class="tag">非真实药品</span></div>
+          <div class="medicine-box" aria-hidden="true">
+            <span class="box-top"></span><span class="box-side"></span><span class="box-front"></span><span class="box-label">TINA DEMO</span>
+          </div>
+        </section>
+      </header>
+
+      <div class="content">
+        <section class="card action-card" aria-label="药品查询入口">
+          <button class="entry-button verify" type="button" data-open="verification" aria-label="查看药品验证详情">
+            <span class="entry-icon" aria-hidden="true">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V5l8-3 8 3v8Z"/><path d="m9 12 2 2 4-4"/></svg>
+            </span>
+            <span class="entry-copy"><strong>药品验证通过</strong><span>有效期内</span></span>
+            <span class="chevron" aria-hidden="true"></span>
+          </button>
+        </section>
+
+        <section class="card section-card">
+          <h2 class="section-title">药品信息 <span>DEMO / MOCK</span></h2>
+          <dl class="data-list">
+            <div class="data-row"><dt>药品通用名称</dt><dd>演示清润片（虚构）</dd></div>
+            <div class="data-row"><dt>生产企业</dt><dd>DEMO 虚构企业（非真实药品）</dd></div>
+            <div class="data-row"><dt>批准文号</dt><dd>DEMO-MOCK-NOT-FOR-USE</dd></div>
+            <div class="data-row"><dt>药品条码</dt><dd>DEMO-001-NOT-FOR-SALE</dd></div>
+          </dl>
+        </section>
+
+        <section class="card section-card">
+          <div class="section-heading">
+            <h2>追溯信息</h2>
+            <button class="section-link" type="button" data-open="trace" aria-label="查看完整药品追溯信息">查看完整追溯<span class="chevron" aria-hidden="true"></span></button>
+          </div>
+          <div class="trace-summary">
+            <div class="trace-summary-item"><span class="trace-summary-mark" aria-hidden="true"></span><strong>生产完成</strong><span>DEMO 虚构企业 · 2026-08-21</span></div>
+            <div class="trace-summary-item"><span class="trace-summary-mark" aria-hidden="true"></span><strong>进入流通</strong><span>演示配送中心 · 2026-08-22</span></div>
+            <div class="trace-summary-item"><span class="trace-summary-mark" aria-hidden="true"></span><strong>到达零售终端</strong><span>演示药房 · 2026-08-23</span></div>
+          </div>
+        </section>
+
+        <p class="demo-notice">本页面仅用于产品界面演示。药品名称、企业、批准文号、条码及追溯记录均为虚构数据。</p>
+      </div>
+    </section>
+
+    <section class="view" id="verification-view" data-view="verification" aria-labelledby="verification-title" hidden>
+      <header class="app-header detail-header">
+        <div class="nav-bar">
+          <button class="icon-button" type="button" data-back aria-label="返回药品详情">
+            <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+            <span class="back-label">返回</span>
+          </button>
+          <div class="nav-title" id="verification-title">验证详情</div>
+        </div>
+      </header>
+      <div class="detail-content">
+        <section class="card result-hero">
+          <div class="result-icon" aria-hidden="true"><svg class="icon" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V5l8-3 8 3v8Z"/><path d="m9 12 2 2 4-4"/></svg></div>
+          <h1>药品已验证通过</h1>
+          <p>追溯码有效，当前在有效期内</p>
+        </section>
+        <section class="card section-card">
+          <h2 class="section-title">扫码验证记录</h2>
+          <div class="scan-rank"><span class="rank-dot">5</span>当前为第 5 位扫码用户</div>
+          <dl class="data-list">
+            <div class="data-row"><dt>总扫码量</dt><dd>10 次 / 5 人</dd></div>
+            <div class="data-row"><dt>首次扫码</dt><dd>2026-08-21 09:30</dd></div>
+            <div class="data-row"><dt>首次扫码地区</dt><dd>北京市朝阳区</dd></div>
+            <div class="data-row"><dt>当前状态</dt><dd>有效期内</dd></div>
+            <div class="data-row"><dt>有效期至</dt><dd>2028-08-20</dd></div>
+          </dl>
+        </section>
+        <p class="source-note">验证信息为演示数据，不代表真实药品流通记录。</p>
+      </div>
+    </section>
+
+    <section class="view" id="trace-view" data-view="trace" aria-labelledby="trace-title" hidden>
+      <header class="app-header detail-header">
+        <div class="nav-bar">
+          <button class="icon-button" type="button" data-back aria-label="返回药品详情">
+            <svg class="icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+            <span class="back-label">返回</span>
+          </button>
+          <div class="nav-title" id="trace-title">追溯信息</div>
+        </div>
+      </header>
+      <div class="detail-content">
+        <section class="card">
+          <h2 class="section-title">基本信息 <span>DEMO / MOCK</span></h2>
+          <dl class="data-list">
+            <div class="data-row"><dt>药品通用名称</dt><dd>演示清润片（虚构）</dd></div>
+            <div class="data-row"><dt>药品英文名称</dt><dd>Demo Qingrun Tablets</dd></div>
+            <div class="data-row"><dt>规格</dt><dd>10mg × 7片</dd></div>
+            <div class="data-row"><dt>剂型</dt><dd>片剂</dd></div>
+            <div class="data-row"><dt>上市许可持有人</dt><dd>DEMO 虚构企业</dd></div>
+            <div class="data-row"><dt>批准文号</dt><dd>DEMO-MOCK-NOT-FOR-USE</dd></div>
+            <div class="data-row"><dt>药品条码</dt><dd>DEMO-001-NOT-FOR-SALE</dd></div>
+          </dl>
+          <div class="trace-code">追溯码：DEMO-TRACE-001-20260821</div>
+        </section>
+        <section class="card section-card">
+          <h2 class="section-title">流通记录</h2>
+          <div class="timeline">
+            <div class="timeline-item success"><span class="timeline-dot"></span><strong>生产完成</strong><p>DEMO 虚构企业<br>2026-08-21 08:00</p></div>
+            <div class="timeline-item"><span class="timeline-dot"></span><strong>进入流通</strong><p>演示配送中心<br>2026-08-22 10:30</p></div>
+            <div class="timeline-item"><span class="timeline-dot"></span><strong>到达零售终端</strong><p>演示药房<br>2026-08-23 16:20</p></div>
+          </div>
+        </section>
+        <p class="source-note">追溯链路为界面演示数据，不对应任何真实药品或企业。</p>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const app = document.querySelector('.mobile-app');
+      const views = [...document.querySelectorAll('[data-view]')];
+      const modeButton = document.querySelector('[data-mode-toggle]');
+      const speakButton = document.querySelector('[data-speak]');
+      let currentView = 'home';
+      let speaking = false;
+
+      function setLargeType(enabled) {
+        app.classList.toggle('care-mode', enabled);
+        modeButton.setAttribute('aria-pressed', String(enabled));
+        modeButton.textContent = enabled ? '切换普通版' : '切换大字版';
+        try { localStorage.setItem('tina-large-type', enabled ? 'true' : 'false'); } catch {}
+      }
+
+      function stopSpeaking() {
+        if (!('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
+        speaking = false;
+        speakButton.setAttribute('aria-pressed', 'false');
+        speakButton.querySelector('span').textContent = '语音播报';
+      }
+
+      function toggleSpeech() {
+        if (!('speechSynthesis' in window)) {
+          speakButton.querySelector('span').textContent = '暂不支持播报';
+          speakButton.disabled = true;
+          return;
+        }
+
+        if (speaking) {
+          stopSpeaking();
+          return;
+        }
+
+        const activeView = views.find((view) => view.dataset.view === currentView);
+        const utterance = new SpeechSynthesisUtterance(activeView?.innerText || '');
+        utterance.lang = 'zh-CN';
+        utterance.rate = 0.86;
+        utterance.onend = stopSpeaking;
+        utterance.onerror = stopSpeaking;
+        speaking = true;
+        speakButton.setAttribute('aria-pressed', 'true');
+        speakButton.querySelector('span').textContent = '停止播报';
+        window.speechSynthesis.speak(utterance);
+      }
+
+      function showView(name, push = true) {
+        const next = views.find((view) => view.dataset.view === name);
+        if (!next) return;
+
+        views.forEach((view) => {
+          const active = view === next;
+          view.classList.toggle('is-active', active);
+          view.hidden = !active;
+          view.classList.remove('is-entering');
+        });
+
+        next.classList.add('is-entering');
+        currentView = name;
+        stopSpeaking();
+        window.scrollTo(0, 0);
+
+        if (push) history.pushState({ view: name }, '', name === 'home' ? location.pathname : `#${name}`);
+        const focusTarget = name === 'home' ? next.querySelector('[data-open]') : next.querySelector('[data-back]');
+        requestAnimationFrame(() => focusTarget?.focus({ preventScroll: true }));
+      }
+
+      document.addEventListener('click', (event) => {
+        const modeToggle = event.target.closest('[data-mode-toggle]');
+        if (modeToggle) setLargeType(!app.classList.contains('care-mode'));
+
+        const speechToggle = event.target.closest('[data-speak]');
+        if (speechToggle) toggleSpeech();
+
+        const openButton = event.target.closest('[data-open]');
+        if (openButton) showView(openButton.dataset.open);
+
+        const backButton = event.target.closest('[data-back]');
+        if (backButton) history.back();
+      });
+
+      window.addEventListener('popstate', (event) => {
+        showView(event.state?.view || location.hash.slice(1) || 'home', false);
+      });
+
+      const initialView = location.hash.slice(1);
+      try { setLargeType(localStorage.getItem('tina-large-type') === 'true'); } catch { setLargeType(false); }
+      history.replaceState({ view: initialView || 'home' }, '', location.href);
+      if (initialView) showView(initialView, false);
+    })();
+  </script>
+</body>
+</html>

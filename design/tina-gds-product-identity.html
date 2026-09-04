@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>TINA · 产品数字身份</title>
+  <style>
+    :root {
+      --canvas: #e9eff3;
+      --surface: #ffffff;
+      --surface-muted: #f1f5f6;
+      --surface-tint: #e5eeef;
+      --ink: #192b34;
+      --ink-muted: #657782;
+      --primary: #173f57;
+      --accent: #147e78;
+      --accent-soft: #d9eeeb;
+      --warning: #a46600;
+      --warning-soft: #fff3d4;
+      --danger: #a43f3b;
+      --border: #d6e0e4;
+      --focus: #0b6fc2;
+      --sans: "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      --data: "DIN Alternate", "Bahnschrift", "Arial Narrow", sans-serif;
+      --radius: 8px;
+      --shadow: 0 12px 32px rgba(23, 63, 87, .08);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      min-width: 0;
+      background: var(--canvas);
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-width: 0;
+      margin: 0;
+      color: var(--ink);
+      background: var(--canvas);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior-y: contain;
+    }
+
+    button, textarea { font: inherit; }
+    button { touch-action: manipulation; }
+
+    .page {
+      width: 100%;
+      max-width: 430px;
+      min-height: 100svh;
+      margin: 0 auto;
+      padding: max(12px, env(safe-area-inset-top)) 12px max(32px, env(safe-area-inset-bottom));
+    }
+
+    .accessibility-bar {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      padding: 0 2px;
+    }
+
+    .page-context {
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .large-type-toggle {
+      min-height: 44px;
+      padding: 0 14px;
+      border: 1px solid rgba(20, 126, 120, .3);
+      border-radius: 6px;
+      color: #0c625d;
+      background: var(--surface);
+      font-size: 14px;
+      font-weight: 750;
+      cursor: pointer;
+      box-shadow: 0 5px 14px rgba(23, 63, 87, .06);
+    }
+
+    .large-type-toggle:active { background: var(--accent-soft); }
+
+    .panel {
+      overflow: hidden;
+      border: 1px solid rgba(23, 63, 87, .06);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .product-hero {
+      position: relative;
+      min-height: 344px;
+      display: grid;
+      grid-template-rows: 234px auto;
+    }
+
+    .product-visual {
+      position: relative;
+      overflow: hidden;
+      background: var(--surface-tint);
+      isolation: isolate;
+    }
+
+    .product-visual::before {
+      content: "TINA";
+      position: absolute;
+      z-index: -1;
+      top: -38px;
+      right: -9px;
+      color: rgba(23, 63, 87, .055);
+      font-family: var(--data);
+      font-size: 132px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .brand-line {
+      position: absolute;
+      z-index: 5;
+      top: 16px;
+      left: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--primary);
+      font-family: var(--data);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: var(--primary);
+      font-size: 16px;
+    }
+
+    .verified {
+      position: absolute;
+      z-index: 5;
+      top: 16px;
+      right: 16px;
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 9px;
+      border: 1px solid rgba(20, 126, 120, .22);
+      border-radius: 999px;
+      color: #0c625d;
+      background: rgba(255, 255, 255, .78);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .verified-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .blister {
+      position: absolute;
+      z-index: 1;
+      top: 73px;
+      left: calc(50% - 104px);
+      width: 98px;
+      height: 138px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid rgba(23, 63, 87, .18);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, .46);
+      transform: rotate(-5deg);
+    }
+
+    .blister span {
+      display: block;
+      border: 1px solid rgba(23, 63, 87, .13);
+      border-radius: 50%;
+      background: #d7e6df;
+      box-shadow: inset -4px -4px 8px rgba(23, 63, 87, .12);
+    }
+
+    .pack {
+      position: absolute;
+      z-index: 2;
+      top: 58px;
+      left: calc(50% - 4px);
+      width: 132px;
+      height: 164px;
+      padding: 15px 14px;
+      color: var(--primary);
+      background: #fbfcfa;
+      box-shadow: 7px 8px 0 var(--accent);
+      transform: translateX(-50%);
+    }
+
+    .pack::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 13px;
+      height: 100%;
+      background: #e4e9e5;
+      clip-path: polygon(100% 0, 100% 100%, 0 96%, 0 4%);
+    }
+
+    .pack small,
+    .pack strong,
+    .pack span { display: block; }
+
+    .pack small {
+      font-family: var(--data);
+      font-size: 8px;
+      font-weight: 700;
+    }
+
+    .pack strong {
+      max-width: 4ch;
+      margin-top: 25px;
+      font-size: 25px;
+      line-height: 1.13;
+    }
+
+    .pack-rule {
+      width: 58px;
+      height: 5px;
+      margin-top: 11px;
+      background: var(--accent);
+    }
+
+    .pack-spec {
+      margin-top: 8px;
+      font-family: var(--data);
+      font-size: 8px;
+      font-weight: 700;
+    }
+
+    .demo-flag {
+      position: absolute;
+      z-index: 4;
+      right: 16px;
+      bottom: 14px;
+      padding: 5px 8px;
+      color: #674200;
+      background: var(--warning-soft);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .product-summary {
+      min-width: 0;
+      padding: 17px 18px 18px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px 14px;
+      align-items: end;
+    }
+
+    .product-summary h1 {
+      margin: 0;
+      font-size: 25px;
+      line-height: 1.25;
+      font-weight: 750;
+      letter-spacing: 0;
+      text-wrap: balance;
+    }
+
+    .product-summary > p {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: var(--ink-muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .identity-code {
+      color: var(--accent);
+      font-family: var(--data);
+      font-size: 11px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .digital-card { margin-top: 12px; }
+
+    .barcode {
+      height: 22px;
+      margin: 0 8px;
+      border-radius: 4px 4px 0 0;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          var(--primary) 0 1px,
+          transparent 1px 3px,
+          var(--primary) 3px 5px,
+          transparent 5px 8px,
+          var(--primary) 8px 9px,
+          transparent 9px 12px
+        );
+      opacity: .28;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      padding: 0 8px 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab {
+      min-height: 48px;
+      border: 0;
+      border-bottom: 3px solid transparent;
+      color: var(--ink-muted);
+      background: transparent;
+      font-weight: 700;
+      cursor: pointer;
+      transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease;
+    }
+
+    .tab:hover { background: var(--surface-muted); }
+    .tab:active { background: var(--surface-tint); }
+    .tab[aria-selected="true"] {
+      border-bottom-color: var(--accent);
+      color: var(--primary);
+    }
+
+    .tab:focus-visible,
+    .large-type-toggle:focus-visible,
+    summary:focus-visible,
+    .feedback-action:focus-visible,
+    .dialog-close:focus-visible,
+    textarea:focus-visible,
+    .submit-button:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .tab-panel { padding: 16px; }
+    .tab-panel[hidden] { display: none; }
+
+    .info-section + .info-section {
+      margin-top: 16px;
+      border-top: 1px solid var(--border);
+      padding-top: 16px;
+    }
+
+    .section-title {
+      margin: 0 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--primary);
+      font-size: 16px;
+      font-weight: 750;
+    }
+
+    .section-title::before {
+      content: "";
+      width: 4px;
+      height: 17px;
+      flex: 0 0 auto;
+      border-radius: 2px;
+      background: var(--accent);
+    }
+
+    .field-list { margin: 0; }
+
+    .field-row {
+      min-height: 58px;
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr);
+      gap: 16px;
+      align-items: center;
+      padding: 11px 2px;
+      border-top: 1px solid var(--border);
+    }
+
+    .field-row:first-child { border-top: 0; }
+
+    .field-row dt {
+      color: var(--ink-muted);
+      font-size: 13px;
+    }
+
+    .field-row dd {
+      min-width: 0;
+      margin: 0;
+      overflow-wrap: anywhere;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 650;
+      line-height: 1.5;
+    }
+
+    .status-value {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .status-value::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    details { border-top: 1px solid var(--border); }
+    details:first-of-type { border-top: 0; }
+
+    summary {
+      min-height: 56px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 24px;
+      align-items: center;
+      gap: 12px;
+      list-style: none;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 650;
+      cursor: pointer;
+    }
+
+    summary::-webkit-details-marker { display: none; }
+
+    .chevron {
+      display: grid;
+      width: 24px;
+      height: 24px;
+      place-items: center;
+      color: var(--accent);
+      font-size: 19px;
+      transition: transform 160ms ease;
+    }
+
+    details[open] .chevron { transform: rotate(90deg); }
+
+    .detail-copy {
+      margin: -2px 0 14px;
+      padding: 12px 14px;
+      border-left: 3px solid var(--warning);
+      color: #5f4a1d;
+      background: var(--warning-soft);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .image-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .image-shot {
+      min-height: 180px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface-muted);
+    }
+
+    .image-shot span {
+      width: 74px;
+      height: 105px;
+      display: grid;
+      place-items: center;
+      color: var(--primary);
+      background: #fff;
+      box-shadow: 5px 6px 0 var(--accent);
+      font-size: 13px;
+      font-weight: 750;
+      text-align: center;
+    }
+
+    .image-note {
+      grid-column: 1 / -1;
+      margin: 4px 0 0;
+      color: var(--ink-muted);
+      font-size: 12px;
+    }
+
+    .feedback-panel {
+      margin-top: 12px;
+      padding: 18px 16px 16px;
+    }
+
+    .feedback-panel h2 {
+      margin: 0;
+      color: var(--primary);
+      font-size: 18px;
+      text-align: center;
+    }
+
+    .feedback-panel > p {
+      margin: 9px 0 16px;
+      color: var(--ink-muted);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .feedback-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .feedback-action {
+      min-height: 104px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--ink);
+      background: var(--surface-muted);
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 160ms ease, background-color 160ms ease;
+    }
+
+    .feedback-action:hover { border-color: var(--accent); }
+    .feedback-action:active { background: var(--accent-soft); }
+    .feedback-action strong { font-size: 14px; line-height: 1.4; }
+    .feedback-action span { color: var(--accent); font-size: 13px; font-weight: 650; }
+
+    .page-foot {
+      padding: 22px 8px 0;
+      color: var(--ink-muted);
+      font-size: 11px;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    dialog {
+      width: min(calc(100% - 24px), 406px);
+      max-height: calc(100dvh - 24px);
+      margin: auto auto 0;
+      padding: 0;
+      border: 0;
+      border-radius: 8px 8px 0 0;
+      color: var(--ink);
+      background: var(--surface);
+      box-shadow: 0 -18px 48px rgba(23, 63, 87, .22);
+    }
+
+    dialog::backdrop { background: rgba(15, 34, 45, .48); }
+
+    .dialog-head {
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dialog-head h2 { margin: 0; font-size: 18px; }
+
+    .dialog-close {
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 50%;
+      color: var(--ink-muted);
+      background: var(--surface-muted);
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .feedback-form { padding: 16px 16px max(20px, env(safe-area-inset-bottom)); }
+    .feedback-form label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 700; }
+
+    textarea {
+      width: 100%;
+      min-height: 116px;
+      resize: vertical;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--ink);
+      background: #fff;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .form-help { margin: 7px 0 14px; color: var(--ink-muted); font-size: 12px; }
+
+    .submit-button {
+      width: 100%;
+      min-height: 48px;
+      border: 0;
+      border-radius: 6px;
+      color: #fff;
+      background: var(--primary);
+      font-weight: 750;
+      cursor: pointer;
+    }
+
+    .submit-button:active { background: #0f3145; }
+
+    .toast {
+      position: fixed;
+      z-index: 100;
+      right: 16px;
+      bottom: max(18px, env(safe-area-inset-bottom));
+      left: 16px;
+      max-width: 398px;
+      margin: 0 auto;
+      padding: 12px 14px;
+      border-radius: 6px;
+      color: #fff;
+      background: var(--primary);
+      box-shadow: 0 10px 30px rgba(23, 63, 87, .22);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .toast[hidden] { display: none; }
+
+    @media (max-width: 359px) {
+      .page { padding-right: 8px; padding-left: 8px; }
+      .product-summary { padding-right: 14px; padding-left: 14px; }
+      .tab-panel { padding-right: 13px; padding-left: 13px; }
+      .field-row { grid-template-columns: 80px minmax(0, 1fr); gap: 12px; }
+      .feedback-grid { grid-template-columns: 1fr; }
+      .feedback-action { min-height: 82px; }
+    }
+
+    @media (min-width: 700px) {
+      body { padding: 24px 0; }
+      .page { padding-right: 0; padding-left: 0; }
+    }
+
+    body.large-type {
+      --ink: #0f2029;
+      --ink-muted: #40545f;
+      --border: #bdccd3;
+      font-size: 19px;
+    }
+
+    .large-type .accessibility-bar { min-height: 60px; margin-bottom: 12px; }
+    .large-type .page-context { font-size: 18px; }
+    .large-type .large-type-toggle { min-height: 52px; padding: 0 17px; font-size: 18px; }
+    .large-type .product-hero { grid-template-rows: 244px auto; }
+    .large-type .brand-line { font-size: 15px; }
+    .large-type .verified { min-height: 34px; font-size: 13px; }
+    .large-type .product-summary { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 21px 18px 23px; }
+    .large-type .product-summary h1 { font-size: 31px; }
+    .large-type .identity-code { font-size: 16px; white-space: normal; overflow-wrap: anywhere; }
+    .large-type .product-summary > p { font-size: 18px; line-height: 1.65; }
+    .large-type .barcode { height: 28px; }
+    .large-type .tabs { padding-bottom: 10px; }
+    .large-type .tab { min-height: 64px; font-size: 20px; }
+    .large-type .tab-panel { padding: 19px 18px; }
+    .large-type .section-title { margin-bottom: 15px; font-size: 22px; }
+    .large-type .section-title::before { width: 5px; height: 23px; }
+    .large-type .field-row { grid-template-columns: minmax(0, 1fr); gap: 4px; min-height: 86px; padding: 15px 2px; }
+    .large-type .field-row dt { font-size: 16px; }
+    .large-type .field-row dd { font-size: 20px; line-height: 1.55; }
+    .large-type summary { min-height: 68px; grid-template-columns: minmax(0, 1fr) 32px; font-size: 19px; }
+    .large-type .chevron { width: 32px; height: 32px; font-size: 25px; }
+    .large-type .detail-copy { padding: 15px 16px; font-size: 17px; line-height: 1.75; }
+    .large-type .image-grid { grid-template-columns: minmax(0, 1fr); gap: 13px; }
+    .large-type .image-shot { min-height: 220px; }
+    .large-type .image-shot span { width: 92px; height: 130px; font-size: 17px; }
+    .large-type .image-note { font-size: 16px; }
+    .large-type .feedback-panel { padding: 22px 18px 18px; }
+    .large-type .feedback-panel h2 { font-size: 25px; }
+    .large-type .feedback-panel > p { font-size: 17px; line-height: 1.75; }
+    .large-type .feedback-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .large-type .feedback-action { min-height: 98px; padding: 16px; }
+    .large-type .feedback-action strong { font-size: 19px; }
+    .large-type .feedback-action span { font-size: 17px; }
+    .large-type .page-foot { font-size: 14px; }
+    .large-type dialog { width: min(calc(100% - 20px), 420px); }
+    .large-type .dialog-head { min-height: 70px; }
+    .large-type .dialog-head h2 { font-size: 23px; }
+    .large-type .dialog-close { width: 52px; height: 52px; font-size: 29px; }
+    .large-type .feedback-form { padding: 19px 18px max(24px, env(safe-area-inset-bottom)); }
+    .large-type .feedback-form label { font-size: 19px; }
+    .large-type textarea { min-height: 145px; font-size: 19px; }
+    .large-type .form-help { font-size: 15px; }
+    .large-type .submit-button { min-height: 56px; font-size: 19px; }
+    .large-type .toast { font-size: 17px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="accessibility-bar" aria-label="显示设置">
+      <span class="page-context">TINA 产品数字身份</span>
+      <button class="large-type-toggle" type="button" aria-pressed="false">切换大字版</button>
+    </div>
+    <article class="panel product-hero" aria-labelledby="product-name">
+      <div class="product-visual" role="img" aria-label="演示清润片原创虚构包装与片剂模型">
+        <div class="brand-line"><span class="brand-mark">T</span><span>TINA</span></div>
+        <span class="verified"><span class="verified-dot" aria-hidden="true"></span>演示身份已登记</span>
+        <div class="blister" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="pack" aria-hidden="true">
+          <small>TINA / DEMO 001</small>
+          <strong>清润片</strong>
+          <span class="pack-rule"></span>
+          <span class="pack-spec">0.45 g × 24 片</span>
+        </div>
+        <span class="demo-flag">虚构展品 · 不可服用</span>
+      </div>
+      <div class="product-summary">
+        <h1 id="product-name">演示清润片</h1>
+        <span class="identity-code">ID TINA-DEMO-001</span>
+        <p>薄荷青果植物复配含片（虚构展品）<br />登记时间：2026-08-27</p>
+      </div>
+    </article>
+
+    <section class="panel digital-card" aria-label="产品数字身份详情">
+      <div class="barcode" aria-hidden="true"></div>
+      <div class="tabs" role="tablist" aria-label="产品资料视图">
+        <button class="tab" id="tab-info" type="button" role="tab" aria-selected="true" aria-controls="panel-info">产品信息</button>
+        <button class="tab" id="tab-images" type="button" role="tab" aria-selected="false" aria-controls="panel-images" tabindex="-1">产品图片</button>
+      </div>
+
+      <div class="tab-panel" id="panel-info" role="tabpanel" aria-labelledby="tab-info">
+        <section class="info-section" aria-labelledby="identity-heading">
+          <h2 class="section-title" id="identity-heading">产品身份信息</h2>
+          <dl class="field-list">
+            <div class="field-row"><dt>产品种类</dt><dd>口腔与咽喉护理 · 展会样品</dd></div>
+            <div class="field-row"><dt>规格型号</dt><dd>0.45 g × 24 片</dd></div>
+            <div class="field-row"><dt>产品状态</dt><dd><span class="status-value">演示资料有效</span></dd></div>
+            <div class="field-row"><dt>展示企业</dt><dd>澄川生命科技有限公司（虚构）</dd></div>
+          </dl>
+        </section>
+
+        <section class="info-section" aria-labelledby="safety-heading">
+          <h2 class="section-title" id="safety-heading">质量安全信息</h2>
+          <details open>
+            <summary>安全说明 <span class="chevron" aria-hidden="true">›</span></summary>
+            <p class="detail-copy">本页面为展会虚构资料，不对应真实药品，不可用于诊疗或个体化用药。</p>
+          </details>
+          <details>
+            <summary>保存条件 <span class="chevron" aria-hidden="true">›</span></summary>
+            <p class="detail-copy">密封置于阴凉干燥处。该描述仅为界面展示设定。</p>
+          </details>
+          <details>
+            <summary>资料来源 <span class="chevron" aria-hidden="true">›</span></summary>
+            <p class="detail-copy">TINA 2026 展会 DEMO 虚构样品资料。</p>
+          </details>
+        </section>
+      </div>
+
+      <div class="tab-panel" id="panel-images" role="tabpanel" aria-labelledby="tab-images" hidden>
+        <div class="image-grid">
+          <div class="image-shot" role="img" aria-label="虚构产品正面视觉"><span>清润片<br />正面</span></div>
+          <div class="image-shot" role="img" aria-label="虚构产品侧面视觉"><span>清润片<br />侧面</span></div>
+          <p class="image-note">原创虚构包装视觉，仅用于展会界面评审，不对应真实商品。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel feedback-panel" aria-labelledby="feedback-title">
+      <h2 id="feedback-title">投诉反馈</h2>
+      <p>若实物或宣传内容与本页面登记资料不一致，可选择问题类型并提交反馈。</p>
+      <div class="feedback-grid">
+        <button class="feedback-action" type="button" data-feedback="实物与本页面不符">
+          <strong>实物与本页面不符</strong><span>去反馈 ›</span>
+        </button>
+        <button class="feedback-action" type="button" data-feedback="宣传与本页面不符">
+          <strong>宣传与本页面不符</strong><span>去反馈 ›</span>
+        </button>
+      </div>
+    </section>
+
+    <p class="page-foot">TINA 产品数字身份 · 当前内容为虚构展会资料</p>
+  </main>
+
+  <dialog id="feedback-dialog" aria-labelledby="dialog-title">
+    <header class="dialog-head">
+      <h2 id="dialog-title">提交反馈</h2>
+      <button class="dialog-close" type="button" aria-label="关闭反馈表单">×</button>
+    </header>
+    <form class="feedback-form" method="dialog">
+      <label for="feedback-message">补充说明</label>
+      <textarea id="feedback-message" placeholder="请描述发现的问题" maxlength="300"></textarea>
+      <p class="form-help">请勿填写姓名、电话或其他个人敏感信息。</p>
+      <button class="submit-button" type="submit" value="submit">提交反馈</button>
+    </form>
+  </dialog>
+
+  <p class="toast" role="status" aria-live="polite" hidden>界面演示完成，未向外部提交</p>
+
+  <script>
+    const largeTypeToggle = document.querySelector('.large-type-toggle');
+
+    function setLargeType(enabled) {
+      document.body.classList.toggle('large-type', enabled);
+      largeTypeToggle.setAttribute('aria-pressed', String(enabled));
+      largeTypeToggle.textContent = enabled ? '切换普通版' : '切换大字版';
+      try { localStorage.setItem('tina-gds-large-type', enabled ? 'true' : 'false'); } catch {}
+    }
+
+    largeTypeToggle.addEventListener('click', () => {
+      setLargeType(!document.body.classList.contains('large-type'));
+    });
+
+    try {
+      setLargeType(localStorage.getItem('tina-gds-large-type') === 'true');
+    } catch {
+      setLargeType(false);
+    }
+
+    const tabs = [...document.querySelectorAll('[role="tab"]')];
+    const panels = [...document.querySelectorAll('[role="tabpanel"]')];
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => selectTab(index));
+      tab.addEventListener('keydown', (event) => {
+        if (!['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+        event.preventDefault();
+        const next = event.key === 'ArrowRight' ? (index + 1) % tabs.length : (index - 1 + tabs.length) % tabs.length;
+        selectTab(next);
+        tabs[next].focus();
+      });
+    });
+
+    function selectTab(index) {
+      tabs.forEach((tab, tabIndex) => {
+        const selected = tabIndex === index;
+        tab.setAttribute('aria-selected', String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        panels[tabIndex].hidden = !selected;
+      });
+    }
+
+    const dialog = document.querySelector('#feedback-dialog');
+    const dialogTitle = document.querySelector('#dialog-title');
+    const closeButton = document.querySelector('.dialog-close');
+    const feedbackForm = document.querySelector('.feedback-form');
+    const toast = document.querySelector('.toast');
+    let toastTimer;
+
+    document.querySelectorAll('[data-feedback]').forEach((button) => {
+      button.addEventListener('click', () => {
+        dialogTitle.textContent = button.dataset.feedback;
+        dialog.showModal();
+      });
+    });
+
+    closeButton.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+
+    feedbackForm.addEventListener('submit', () => {
+      clearTimeout(toastTimer);
+      toast.hidden = false;
+      toastTimer = setTimeout(() => { toast.hidden = true; }, 3200);
+      feedbackForm.reset();
+    });
+  </script>
+</body>
+</html>
