@@ -7,7 +7,8 @@ export default defineConfig(({ command }) => ({
   server: {
     port: 5173,
     proxy: {
-      "/api": "http://127.0.0.1:8000",
+      "/api/chat": "http://127.0.0.1:8002",
+      "/api": "http://127.0.0.1:8001",
     },
   },
 }));

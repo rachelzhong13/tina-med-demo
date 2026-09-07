@@ -4,19 +4,22 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     environment:
-      APP_ENV: ${APP_ENV:-development}
+      APP_ENV: ${APP_ENV:-production}
       DATABASE_PATH: /app/data/tina_med.db
+      KNOWLEDGE_DIR: /app/knowledge
       LLM_API_KEY: ${LLM_API_KEY:-}
       LLM_BASE_URL: ${LLM_BASE_URL:-}
       LLM_MODEL: ${LLM_MODEL:-}
       LLM_TIMEOUT: ${LLM_TIMEOUT:-60}
-      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-https://iotns.org.cn/TINAapimed}
+      STT_MODEL: ${STT_MODEL:-}
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-https://ioaforthings.iotns.org.cn/TINAapimed}
       PUBLIC_ROUTER_MODE: ${PUBLIC_ROUTER_MODE:-history}
-      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://ioaforthings.iotns.org.cn,http://ioaforthings.iotns.org.cn,http://14.22.78.213}
     volumes:
       - ./backend/data:/app/data
-    ports:
-      - "127.0.0.1:8000:8000"
+      - ./knowledge:/app/knowledge:ro
+    expose:
+      - "8000"
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
       interval: 10s
@@ -26,7 +29,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "127.0.0.1:8080:80"
+      - "0.0.0.0:80:80"
     depends_on:
       backend:
         condition: service_healthy

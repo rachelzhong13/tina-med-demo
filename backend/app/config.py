@@ -24,6 +24,11 @@ class Settings:
     voice_max_bytes: int
     public_base_url: str
     public_router_mode: str
+    knowledge_dir: str
+    knowledge_max_chars: int
+    web_search_enabled: bool
+    web_search_max_results: int
+    web_search_timeout: float
     cors_origins: tuple[str, ...]
 
 
@@ -47,5 +52,11 @@ def get_settings() -> Settings:
             "PUBLIC_BASE_URL", "https://iotns.org.cn/TINAapimed"
         ).rstrip("/"),
         public_router_mode=os.getenv("PUBLIC_ROUTER_MODE", "history").strip().lower(),
+        knowledge_dir=os.getenv("KNOWLEDGE_DIR", "knowledge").strip(),
+        knowledge_max_chars=int(os.getenv("KNOWLEDGE_MAX_CHARS", "30000")),
+        web_search_enabled=os.getenv("WEB_SEARCH_ENABLED", "1").strip().lower()
+        not in ("0", "false", "no", "off"),
+        web_search_max_results=int(os.getenv("WEB_SEARCH_MAX_RESULTS", "5")),
+        web_search_timeout=float(os.getenv("WEB_SEARCH_TIMEOUT", "8")),
         cors_origins=tuple(origin.strip() for origin in origins if origin.strip()),
     )

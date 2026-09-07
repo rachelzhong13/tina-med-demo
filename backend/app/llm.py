@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import json
+import logging
 
 import httpx
 
 from .config import get_settings
+
+
+logger = logging.getLogger("tina-med-demo.llm")
 
 
 class LLMNotConfigured(Exception):
@@ -50,13 +54,24 @@ async def complete(messages: list[dict[str, str]]) -> str:
         raise LLMRequestFailed from exc
 
     if response.status_code >= 400:
+        logger.warning(
+            "llm_complete_failed status=%s body=%s",
+            response.status_code,
+            response.text[:1000],
+        )
         raise LLMRequestFailed
     try:
         data = response.json()
-        answer = data["choices"][0]["message"]["content"]
+        message = data["choices"][0]["message"]
+        answer = message.get("content") or message.get("reasoning_content") or message.get("text")
     except (KeyError, IndexError, TypeError, ValueError) as exc:
+        logger.warning(
+            "llm_complete_parse_failed body=%s",
+            response.text[:1000],
+        )
         raise LLMRequestFailed from exc
     if not isinstance(answer, str) or not answer.strip():
+        logger.warning("llm_complete_empty_content body=%s", response.text[:1000])
         raise LLMRequestFailed
     return answer.strip()
 
@@ -84,6 +99,12 @@ async def stream_complete(messages: list[dict[str, str]]):
                 "POST", endpoint, headers=headers, json=payload
             ) as response:
                 if response.status_code >= 400:
+                    error_body = await response.aread()
+                    logger.warning(
+                        "llm_stream_failed status=%s body=%s",
+                        response.status_code,
+                        error_body.decode("utf-8", errors="replace")[:1000],
+                    )
                     raise LLMRequestFailed
 
                 async for line in response.aiter_lines():
@@ -111,4 +132,5 @@ async def stream_complete(messages: list[dict[str, str]]):
     except httpx.TimeoutException as exc:
         raise LLMTimeout from exc
     except httpx.HTTPError as exc:
+        logger.warning("llm_complete_http_error error=%r", exc)
         raise LLMRequestFailed from exc

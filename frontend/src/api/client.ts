@@ -1,5 +1,6 @@
 import type {
   ChatHistory,
+  ChatResponse,
   Medicine,
   MedicineSummary,
   SessionResponse,
@@ -23,10 +24,10 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return data as T;
 }
 
+export const getMedicines = () => request<MedicineSummary[]>("/medicines");
+
 export const getMedicine = (id: string) =>
   request<Medicine>(`/medicines/${encodeURIComponent(id)}`);
-
-export const getMedicines = () => request<MedicineSummary[]>("/medicines");
 
 export const createSession = (medicineId: string) =>
   request<SessionResponse>("/chat/sessions", {
@@ -36,3 +37,17 @@ export const createSession = (medicineId: string) =>
 
 export const getHistory = (sessionId: string) =>
   request<ChatHistory>(`/chat/sessions/${encodeURIComponent(sessionId)}`);
+
+export const sendChat = (
+  medicineId: string,
+  sessionId: string,
+  message: string,
+) =>
+  request<ChatResponse>("/chat", {
+    method: "POST",
+    body: JSON.stringify({
+      medicine_id: medicineId,
+      session_id: sessionId,
+      message,
+    }),
+  });
